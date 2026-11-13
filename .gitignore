@@ -1,0 +1,40 @@
+# РЎР±РѕСЂРєР° Android
+
+*.iml
+.gradle/
+.kotlin/
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild
+.cxx
+local.properties
+
+# Python
+__pycache__/
+*.pyc
+
+# РЎР»СѓР¶РµР±РЅРѕРµ
+build-log.txt
+
+# локальные артефакты
+.dsh-office-*/
+shots/
+*.log
+gh/
+screens.html
+verify*.py
+analyze_slides.py
+proxy.py
+sheet.py
+chk*.py
+imgcheck.py
+pptx_check.py
+mkqr.py
+contact.png
+chk.png
+tmp.png
+
+probe*.py
+slide_analysis.txt

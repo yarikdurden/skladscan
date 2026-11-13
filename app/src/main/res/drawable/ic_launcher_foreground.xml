@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- scan frame corners -->
+    <path
+        android:fillColor="#C6FF4A"
+        android:pathData="M30,38 L30,30 L38,30 L38,26 L26,26 L26,38 Z" />
+    <path
+        android:fillColor="#C6FF4A"
+        android:pathData="M70,26 L82,26 L82,38 L78,38 L78,30 L70,30 Z" />
+    <path
+        android:fillColor="#C6FF4A"
+        android:pathData="M82,70 L82,82 L70,82 L70,78 L78,78 L78,70 Z" />
+    <path
+        android:fillColor="#C6FF4A"
+        android:pathData="M26,70 L30,70 L30,78 L38,78 L38,82 L26,82 Z" />
+    <!-- barcode -->
+    <path
+        android:fillColor="#F4F7EE"
+        android:pathData="M38,42 L41,42 L41,66 L38,66 Z" />
+    <path
+        android:fillColor="#F4F7EE"
+        android:pathData="M44,42 L45,42 L45,66 L44,66 Z" />
+    <path
+        android:fillColor="#C6FF4A"
+        android:pathData="M48,42 L53,42 L53,66 L48,66 Z" />
+    <path
+        android:fillColor="#F4F7EE"
+        android:pathData="M56,42 L57,42 L57,66 L56,66 Z" />
+    <path
+        android:fillColor="#F4F7EE"
+        android:pathData="M60,42 L64,42 L64,66 L60,66 Z" />
+    <path
+        android:fillColor="#F4F7EE"
+        android:pathData="M67,42 L68,42 L68,66 L67,66 Z" />
+    <path
+        android:fillColor="#F4F7EE"
+        android:pathData="M71,42 L74,42 L74,66 L71,66 Z" />
+</vector>

@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>СкладСкан — презентация</title>
+<style>
+  @font-face{font-family:Manrope;src:url('./assets/manrope.ttf') format('truetype');font-weight:200 800;font-display:block}
+  :root{
+    --ink:#070A0F; --ink2:#0A0E15; --surface:#101722; --surface2:#17212F;
+    --stroke:rgba(255,255,255,.10); --stroke2:rgba(255,255,255,.06);
+    --text:#F2F6E9; --dim:#98A4B2; --muted:#697585;
+    --lime:#C6FF4A; --mint:#7BF0B4; --cyan:#63E6FF; --amber:#FFC24B; --coral:#FF6B7A; --violet:#B69CFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#05070A;color:var(--text);font-family:Manrope,system-ui,sans-serif;
+    overflow:hidden;-webkit-font-smoothing:antialiased}
+  #viewport{position:fixed;inset:0;display:grid;place-items:center}
+  #deck{width:1280px;height:720px;position:relative;transform-origin:center center;background:var(--ink);
+    box-shadow:0 40px 120px rgba(0,0,0,.75);overflow:hidden}
+
+  .slide{position:absolute;inset:0;padding:44px 64px 62px;display:flex;flex-direction:column;
+    opacity:0;visibility:hidden;transform:translateY(18px);transition:opacity .45s ease,transform .45s ease;
+    background:
+      radial-gradient(560px 420px at 88% -10%,rgba(198,255,74,.11),transparent 70%),
+      radial-gradient(620px 460px at -8% 108%,rgba(99,230,255,.09),transparent 70%),
+      linear-gradient(180deg,#080B11,#06090D);
+  }
+  .slide.active{opacity:1;visibility:visible;transform:none}
+  .slide::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
+    background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+    background-size:64px 64px;
+    -webkit-mask-image:radial-gradient(70% 70% at 50% 40%,#000,transparent 100%);
+            mask-image:radial-gradient(70% 70% at 50% 40%,#000,transparent 100%)}
+
+  /* ---------- header / footer ---------- */
+  .top{display:flex;align-items:center;gap:10px;margin-bottom:26px;position:relative;z-index:3;flex:none}
+  .logo{width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,var(--lime),var(--mint));
+    display:grid;place-items:center;color:#101505;flex:none}
+  .logo svg{width:16px;height:16px}
+  .brand{font-size:10px;font-weight:800;letter-spacing:2.2px}
+  .sec{margin-left:auto;font-size:9.5px;font-weight:800;letter-spacing:1.8px;color:var(--muted);text-transform:uppercase}
+  .foot{position:absolute;left:64px;right:64px;bottom:24px;display:flex;align-items:center;gap:10px;
+    font-size:9.5px;font-weight:700;letter-spacing:1.1px;color:var(--muted);text-transform:uppercase;z-index:3}
+  .foot .line{flex:1;height:1px;background:rgba(255,255,255,.07)}
+  .foot b{color:var(--dim);font-weight:800}
+
+  /* ---------- typography ---------- */
+  .kicker{display:inline-flex;align-items:center;gap:9px;font-size:10px;font-weight:800;letter-spacing:2.2px;
+    color:var(--lime);text-transform:uppercase;margin-bottom:14px}
+  .kicker::before{content:"";width:26px;height:1.5px;background:var(--lime);border-radius:2px}
+  h2{font-size:44px;line-height:1.03;letter-spacing:-1.6px;font-weight:800;max-width:1000px}
+  h2 .dim{color:var(--muted)}
+  .lead{font-size:15.5px;line-height:1.5;color:var(--dim);max-width:640px;margin-top:14px}
+  .accent{color:var(--lime)}
+  .cyan{color:var(--cyan)}
+  .amber{color:var(--amber)}
+  .coral{color:var(--coral)}
+
+  .card{background:rgba(255,255,255,.028);border:1px solid var(--stroke);border-radius:22px;padding:20px}
+
+  /* ---------- title ---------- */
+  .title-slide{justify-content:center;padding-left:72px;padding-right:0}
+  .title-slide .glow{position:absolute;right:-120px;top:50%;transform:translateY(-50%);width:820px;height:820px;
+    border-radius:50%;background:radial-gradient(circle,rgba(198,255,74,.18),rgba(198,255,74,.03) 45%,transparent 70%);z-index:0}
+  .title-left{position:relative;z-index:2;max-width:690px}
+  .title-slide h1{font-size:104px;line-height:.95;letter-spacing:-5px;font-weight:800;margin:6px 0 0}
+  .title-slide h1 span{color:var(--lime)}
+  .title-slide .lead{font-size:18px;line-height:1.45;max-width:560px;margin-top:22px;color:#C7D0DC}
+  .chiprow{display:flex;flex-wrap:wrap;gap:7px;margin-top:26px;max-width:560px}
+  .chip{font-size:10.5px;font-weight:700;color:var(--dim);border:1px solid var(--stroke);border-radius:999px;
+    padding:6px 11px;background:rgba(255,255,255,.03)}
+  .title-meta{margin-top:34px;display:flex;align-items:center;gap:12px;font-size:10px;font-weight:700;
+    letter-spacing:1.4px;color:var(--muted);text-transform:uppercase}
+  .title-meta i{width:4px;height:4px;border-radius:50%;background:var(--muted)}
+  .title-phone{position:absolute;right:78px;top:50%;transform:translateY(-50%) rotate(-3.5deg);z-index:2;
+    filter:drop-shadow(0 50px 80px rgba(0,0,0,.7))}
+  .title-phone img{height:620px;display:block;border-radius:38px}
+
+  /* ---------- problem ---------- */
+  .two{display:grid;grid-template-columns:1.02fr .98fr;gap:46px;align-items:start;align-content:center;flex:1;min-height:0}
+  .pains{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+  .pain{display:flex;gap:13px;align-items:flex-start;padding:11px 14px;border:1px solid var(--stroke2);
+    border-radius:14px;background:rgba(255,255,255,.02)}
+  .pain .n{font-size:10px;font-weight:800;color:var(--coral);letter-spacing:1px;padding-top:2px;width:20px;flex:none}
+  .pain b{display:block;font-size:13.5px;letter-spacing:-.1px}
+  .pain p{font-size:11.5px;line-height:1.45;color:var(--dim);margin-top:3px}
+  .truth{margin-top:22px;padding:18px 20px;border-radius:20px;border:1px solid rgba(255,107,122,.25);
+    background:linear-gradient(135deg,rgba(255,107,122,.10),rgba(255,107,122,.02))}
+  .truth .t{font-size:11px;font-weight:800;letter-spacing:1.6px;color:var(--coral);text-transform:uppercase}
+  .truth .q{font-size:17px;font-weight:700;line-height:1.35;margin-top:8px;letter-spacing:-.3px}
+  .truth .s{font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.45}
+
+  /* ---------- steps ---------- */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
+  .step{position:relative;padding:28px 26px;border-radius:24px;border:1px solid var(--stroke);min-height:294px;
+    background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.015));overflow:hidden}
+  .step .big{position:absolute;right:16px;top:6px;font-size:74px;font-weight:800;letter-spacing:-4px;
+    color:rgba(255,255,255,.045);line-height:1}
+  .step .ic{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;margin-bottom:16px}
+  .step h3{font-size:18px;letter-spacing:-.3px;font-weight:800}
+  .step p{font-size:12.5px;line-height:1.55;color:var(--dim);margin-top:8px}
+  .step .footnote{font-size:10px;font-weight:700;color:var(--muted);margin-top:14px;letter-spacing:.2px}
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+  .fact{padding:16px 18px;border-radius:16px;background:rgba(198,255,74,.05);border:1px solid rgba(198,255,74,.16)}
+  .fact b{display:block;font-size:18px;font-weight:800;letter-spacing:-.3px}
+  .fact span{font-size:10.5px;color:var(--dim)}
+
+  /* ---------- screenshots ---------- */
+  .shots{display:flex;justify-content:center;align-items:flex-start;gap:30px;margin-top:2px;flex:1;min-height:0}
+  .shots.four{gap:24px}
+  .shots.four .shot{width:246px}
+  .shots.four .shot img{height:388px}
+  .shot{width:330px;text-align:center}
+  .shot img{height:418px;display:block;margin:0 auto;border-radius:28px;
+    filter:drop-shadow(0 30px 60px rgba(0,0,0,.65))}
+  .shot .cap{margin-top:14px}
+  .shot .cap b{display:block;font-size:13px;font-weight:800;letter-spacing:-.1px}
+  .shot .cap span{display:block;font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+
+  /* ---------- feature grid ---------- */
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
+  .feature{padding:24px;border-radius:20px;border:1px solid var(--stroke2);background:rgba(255,255,255,.022);
+    display:flex;flex-direction:column}
+  .feature .fh{display:flex;align-items:center;gap:10px}
+  .feature .fi{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;flex:none}
+  .feature h3{font-size:15px;font-weight:800;letter-spacing:-.1px}
+  .feature p{font-size:12px;line-height:1.55;color:var(--dim);margin-top:9px}
+  .feature .ftag{margin-top:auto;padding-top:16px;font-size:9px;font-weight:800;letter-spacing:1.3px;
+    text-transform:uppercase;color:var(--muted)}
+
+  /* ---------- personas ---------- */
+  .personas{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}
+  .persona{padding:22px 22px;border-radius:18px;border:1px solid var(--stroke2);background:rgba(255,255,255,.022);
+    display:flex;gap:14px;min-height:112px;align-items:center}
+  .persona .pn{font-size:26px;font-weight:800;letter-spacing:-1px;color:rgba(198,255,74,.5);width:36px;flex:none}
+  .persona b{font-size:13.5px}
+  .persona p{font-size:11px;color:var(--dim);line-height:1.45;margin-top:4px}
+  .notfor{margin-top:20px;padding:17px 20px;border-radius:16px;border:1px dashed rgba(255,194,75,.35);
+    background:rgba(255,194,75,.05);font-size:11.5px;line-height:1.5;color:var(--dim)}
+  .notfor b{color:var(--amber)}
+  .closing{margin-top:18px;border-left:2px solid var(--lime);padding:4px 0 4px 16px;font-size:13px;
+    line-height:1.45;color:#D6DEE8;letter-spacing:-.1px}
+  .closing b{color:var(--lime)}
+
+  /* ---------- architecture ---------- */
+  .arch{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;margin-top:22px;flex:1;min-height:0}
+  .stack{display:flex;flex-direction:column;gap:0}
+  .layer{border:1px solid var(--stroke);border-radius:16px;padding:19px 18px;background:rgba(255,255,255,.028);
+    display:flex;align-items:center;gap:12px}
+  .layer .lh{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);width:92px;flex:none}
+  .layer b{font-size:12.5px}
+  .layer span{font-size:10.5px;color:var(--dim);margin-left:auto;text-align:right}
+  .layer.lime{border-color:rgba(198,255,74,.28);background:linear-gradient(135deg,rgba(198,255,74,.09),rgba(255,255,255,.02))}
+  .connector{height:26px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:9px;
+    font-weight:700;letter-spacing:1px;position:relative}
+  .connector::before{content:"";position:absolute;width:1px;height:100%;background:rgba(255,255,255,.12)}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .note-list{display:flex;flex-direction:column;gap:13px}
+  .note{display:flex;gap:11px;align-items:flex-start}
+  .note .nd{width:6px;height:6px;border-radius:50%;background:var(--lime);margin-top:6px;flex:none}
+  .note b{font-size:12.5px;display:block}
+  .note p{font-size:11px;line-height:1.5;color:var(--dim);margin-top:3px}
+  .lifecycle{margin-top:18px;display:flex;align-items:center;border:1px solid var(--stroke);border-radius:18px;
+    padding:14px 18px;background:rgba(255,255,255,.022)}
+  .lifecycle .lt{font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);
+    margin-right:16px;flex:none;width:74px;line-height:1.5}
+  .lcstep{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .lcstep b{font-size:11.5px;letter-spacing:-.1px}
+  .lcstep span{font-size:9.5px;color:var(--muted)}
+  .lcarrow{color:#3D4856;margin:0 11px;font-size:12px;flex:none}
+  .lcstep.hot b{color:var(--lime)}
+
+  /* ---------- alternatives ---------- */
+  .alts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;flex:1}
+  .alt{padding:17px;border-radius:18px;border:1px solid var(--stroke2);background:rgba(255,255,255,.022);
+    display:flex;flex-direction:column}
+  .alt .at{display:flex;align-items:center;gap:8px}
+  .alt .tag{font-size:8.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);border:1px solid var(--stroke);
+    padding:3px 7px;border-radius:999px}
+  .alt h3{font-size:14px;font-weight:800;letter-spacing:-.2px;margin-top:10px;line-height:1.25}
+  .alt p{font-size:10.5px;line-height:1.45;color:var(--dim);margin-top:6px}
+  .alt .price{margin-top:auto;padding-top:10px;font-size:10px;color:var(--muted)}
+  .alt .price b{color:var(--text);font-size:10.5px}
+  .src{font-size:9.5px;color:var(--muted);margin-top:12px}
+  .alt.us{border-color:rgba(198,255,74,.3);background:linear-gradient(160deg,rgba(198,255,74,.10),rgba(255,255,255,.02))}
+
+  /* ---------- table ---------- */
+  .table-wrap{margin-top:16px;border:1px solid var(--stroke);border-radius:18px;overflow:hidden;flex:1;min-height:0}
+  table{width:100%;border-collapse:collapse;font-size:10.5px}
+  thead th{font-size:9px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);font-weight:800;
+    padding:9px 7px;text-align:center;background:rgba(255,255,255,.035);border-bottom:1px solid var(--stroke)}
+  thead th:first-child{text-align:left;padding-left:14px;width:23%}
+  thead th.us{color:var(--lime);background:rgba(198,255,74,.09)}
+  tbody td{padding:8px 7px;text-align:center;border-bottom:1px solid rgba(255,255,255,.045);color:var(--dim)}
+  tbody tr:last-child td{border-bottom:0}
+  tbody td:first-child{text-align:left;padding-left:14px;color:var(--text);font-weight:700;font-size:10.5px}
+  tbody td.us{background:rgba(198,255,74,.045);color:var(--text);font-weight:700}
+  .yes{color:var(--lime);font-weight:800}
+  .part{color:var(--amber);font-weight:800}
+  .no{color:#44505F;font-weight:800}
+  .small{font-size:9px}
+  .legend{display:flex;gap:16px;font-size:9.5px;color:var(--muted);margin-top:10px}
+  .legend b{font-weight:800}
+
+  /* ---------- strengths / weaknesses ---------- */
+  .strs{display:grid;grid-template-columns:1.35fr .65fr;gap:34px;margin-top:26px;flex:1;min-height:0}
+  .strlist{display:flex;flex-direction:column;gap:9px}
+  .str{display:flex;gap:14px;align-items:flex-start;padding:12px 14px;border-radius:15px;
+    border:1px solid var(--stroke2);background:rgba(255,255,255,.02)}
+  .str .sn{width:30px;height:30px;border-radius:10px;background:rgba(198,255,74,.10);border:1px solid rgba(198,255,74,.22);
+    color:var(--lime);display:grid;place-items:center;font-size:11px;font-weight:800;flex:none}
+  .str b{font-size:13.5px;display:block}
+  .str p{font-size:11px;line-height:1.5;color:var(--dim);margin-top:3px}
+  .statcard{border-radius:24px;border:1px solid rgba(198,255,74,.24);padding:24px;
+    background:radial-gradient(120% 100% at 100% 0%,rgba(198,255,74,.16),rgba(255,255,255,.02));display:flex;
+    flex-direction:column;justify-content:center;gap:18px;text-align:left}
+  .statcard .big{font-size:54px;font-weight:800;letter-spacing:-2.5px;line-height:1}
+  .statcard .cap{font-size:11px;color:var(--dim);line-height:1.45;margin-top:2px}
+  .statcard .div{height:1px;background:rgba(255,255,255,.1)}
+  .weak{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+  .w{padding:18px 20px;border-radius:16px;border:1px solid var(--stroke2);background:rgba(255,255,255,.02);
+    min-height:104px;display:flex;flex-direction:column;justify-content:center}
+  .w b{font-size:12.5px;display:flex;align-items:center;gap:9px}
+  .w b i{width:5px;height:5px;border-radius:50%;background:var(--amber);flex:none}
+  .w p{font-size:10.5px;line-height:1.45;color:var(--dim);margin-top:6px}
+  .honest{margin-top:16px;border-left:2px solid var(--lime);padding:6px 0 6px 16px;font-size:14px;line-height:1.45;
+    color:#D6DEE8;letter-spacing:-.1px}
+  .honest b{color:var(--lime)}
+
+  /* ---------- tech ---------- */
+  .tech{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;margin-top:22px;flex:1;min-height:0}
+  .techlist{display:flex;flex-direction:column;gap:8px}
+  .trow{display:flex;align-items:center;gap:12px;padding:9px 13px;border-radius:12px;background:rgba(255,255,255,.022);
+    border:1px solid var(--stroke2)}
+  .trow .ti{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none;
+    background:rgba(198,255,74,.10);color:var(--lime);font-size:10px;font-weight:800}
+  .trow b{font-size:12px}
+  .trow span{margin-left:auto;font-size:10px;color:var(--muted);text-align:right}
+  .build{display:flex;flex-direction:column;gap:12px}
+  .build .card{padding:18px}
+  .kv{display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:6px 0}
+  .kv span{color:var(--muted)}
+  .kv b{font-weight:800}
+  .mono{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;color:#B7C2CF;background:rgba(0,0,0,.35);
+    border:1px solid var(--stroke2);border-radius:7px;padding:5px 8px;margin-top:7px;white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis}
+  .palette{display:flex;gap:6px;margin-top:8px}
+  .sw{flex:1;height:26px;border-radius:7px}
+
+  /* ---------- final ---------- */
+  .final{display:grid;grid-template-columns:1fr 1.02fr;gap:54px;align-items:center;flex:1}
+  .final h2{font-size:50px}
+  .final .lead{margin-top:16px;max-width:480px}
+  .next{margin-top:24px;padding:16px 18px;border:1px solid var(--stroke);border-radius:16px;background:rgba(255,255,255,.022)}
+  .next .l{font-size:9.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+  .next p{font-size:11.5px;color:var(--dim);line-height:1.55;margin-top:7px}
+  .gh-card{position:relative;overflow:hidden;border-radius:28px;border:1px solid rgba(198,255,74,.28);
+    background:radial-gradient(120% 120% at 90% 0%,rgba(198,255,74,.18),rgba(255,255,255,.02) 55%);padding:34px}
+  .gh-card .gh-top{display:flex;align-items:center;gap:13px}
+  .gh-icon{width:50px;height:50px;border-radius:16px;background:var(--text);color:#070A0F;display:grid;place-items:center;flex:none}
+  .gh-card .l{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--lime)}
+  .gh-card .s{font-size:11.5px;color:var(--dim);margin-top:2px}
+  .gh-url{display:block;margin-top:30px;font-size:25px;font-weight:800;letter-spacing:-.8px;color:var(--text);
+    text-decoration:none;line-height:1.28;word-break:break-word;padding-right:150px}
+  .gh-url:hover{color:var(--lime)}
+  .gh-note{margin-top:12px;padding-right:150px;font-size:10.5px;color:var(--muted);line-height:1.45}
+  .qrwrap{position:absolute;right:30px;bottom:28px;display:flex;flex-direction:column;align-items:center;gap:7px}
+  .qrwrap img{width:92px;height:92px;display:block}
+  .qrwrap span{font-size:7.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+  .thanks{margin-top:22px;font-size:10px;font-weight:700;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase}
+
+  /* ---------- chrome ---------- */
+  .hint{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);font-size:10px;color:#4E5A68;
+    letter-spacing:.8px;display:flex;gap:14px;z-index:20;pointer-events:none;transition:opacity .4s;opacity:0}
+  .nav{position:fixed;right:18px;bottom:12px;display:flex;gap:6px;z-index:30;opacity:0;
+    transition:opacity .25s ease}
+  body.moving .nav,body.moving .hint{opacity:1}
+  body.clean .nav,body.clean .hint,body.clean #progress{display:none}
+  body.clean .slide{transition:none}
+  .nav button{width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+    color:#9AA6B4;display:grid;place-items:center;cursor:pointer;font-size:13px}
+  .nav button:hover{color:var(--lime);border-color:rgba(198,255,74,.4)}
+  #progress{position:fixed;left:0;bottom:0;height:2px;width:0;background:linear-gradient(90deg,var(--lime),var(--mint));
+    z-index:40;transition:width .35s ease}
+
+  @media print{
+    html,body{overflow:visible;background:#fff}
+    #viewport{position:static;display:block}
+    #deck{transform:none!important;width:1280px;height:auto;box-shadow:none}
+    .slide{position:relative;opacity:1!important;visibility:visible!important;transform:none!important;
+      width:1280px;height:720px;page-break-after:always}
+    .nav,#progress,.hint{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="deck">
+
+    <!-- ================= 01 TITLE ================= -->
+    <section class="slide title-slide active">
+      <div class="glow"></div>
+      <div class="title-left">
+        <div class="kicker">Мобильный терминал складского учёта</div>
+        <h1>Склад<span>Скан</span></h1>
+        <p class="lead">Сканируй штрихкод камерой телефона, меняй остаток в одно касание и не останавливай склад, когда пропал Wi-Fi.</p>
+        <div class="chiprow">
+          <span class="chip">Android 8+</span>
+          <span class="chip">Kotlin</span>
+          <span class="chip">Jetpack Compose</span>
+          <span class="chip">CameraX</span>
+          <span class="chip">ML Kit</span>
+          <span class="chip">Room</span>
+          <span class="chip">Offline-first</span>
+        </div>
+        <div class="title-meta"><span>2026</span><i></i><span>v1.0.0</span><i></i><span>APK 43 МБ</span></div>
+      </div>
+      <div class="title-phone"><img src="assets/screens/scanner.png" alt="Экран сканера СкладСкан"></div>
+      <div class="foot"><span>СкладСкан</span><span class="line"></span><b>01 / 14</b></div>
+    </section>
+
+    <!-- ================= 02 PROBLEM ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Проблема</span>
+      </div>
+      <div class="two">
+        <div>
+          <div class="kicker">Что не так с учётом</div>
+          <h2>Склад знает всё.<br><span class="dim">Только не в момент операции.</span></h2>
+          <p class="lead">Между полкой и системой — бумага, Excel и человеческая память. Остаток становится «примерным», а расхождения находятся на инвентаризации.</p>
+          <div class="truth">
+            <div class="t">Три источника правды</div>
+            <div class="q">Полка, тетрадь и Excel<br>показывают разное.</div>
+            <div class="s">Итог: пересорт, недостачи и часы сверок вместо работы.</div>
+          </div>
+        </div>
+        <div class="pains">
+          <div class="pain"><span class="n">01</span><div><b>Бумага и Excel</b><p>Записали на лист — потеряли лист. Остаток в системе живёт отдельно от полки.</p></div></div>
+          <div class="pain"><span class="n">02</span><div><b>Дорогие ТСД</b><p>Промышленный терминал — 30–60 тыс. ₽ плюс лицензия на каждое устройство.</p></div></div>
+          <div class="pain"><span class="n">03</span><div><b>Нет сети — нет работы</b><p>Wi-Fi в цеху и на складе падает, а приёмку останавливать нельзя.</p></div></div>
+          <div class="pain"><span class="n">04</span><div><b>Ручной ввод</b><p>Цифры, пересорт, опечатки. Ошибки всплывают через неделю и стоят денег.</p></div></div>
+          <div class="pain"><span class="n">05</span><div><b>Сложные интерфейсы</b><p>Кладовщик обходит ERP: «долго, непонятно, проще в тетрадь».</p></div></div>
+        </div>
+      </div>
+      <div class="foot"><span>Проблема</span><span class="line"></span><b>02 / 14</b></div>
+    </section>
+
+    <!-- ================= 03 SOLUTION ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Решение</span>
+      </div>
+      <div class="kicker">Что делает приложение</div>
+      <h2>Три действия — и остаток сходится</h2>
+      <p class="lead">Один инструмент вместо бумаги, Excel и звонков «а сколько у нас на самом деле?».</p>
+      <div class="steps">
+        <div class="step">
+          <div class="big">01</div>
+          <div class="ic" style="background:rgba(198,255,74,.12);color:var(--lime)">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg>
+          </div>
+          <h3>Сканируй</h3>
+          <p>Камера телефона вместо ТСД. Распознавание на устройстве: 11 форматов, включая EAN-13, Code 128, QR и Data Matrix.</p>
+          <div class="footnote">Подсветка · вибрация · ручной ввод</div>
+        </div>
+        <div class="step">
+          <div class="big">02</div>
+          <div class="ic" style="background:rgba(99,230,255,.12);color:var(--cyan)">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11.2 14 15.5 9M7 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2Z"/></svg>
+          </div>
+          <h3>Подтверди</h3>
+          <p>Приход, списание или пересчёт. Количество, комментарий и проверка: списать больше остатка нельзя.</p>
+          <div class="footnote">Валидация · история по каждому SKU</div>
+        </div>
+        <div class="step">
+          <div class="big">03</div>
+          <div class="ic" style="background:rgba(255,194,75,.12);color:var(--amber)">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 18a3.5 3.5 0 0 1-.4-7A5 5 0 0 1 16 9.5a3.5 3.5 0 0 1 .5 7"/><path d="M12 12v6M9.5 15.5 12 18l2.5-2.5"/></svg>
+          </div>
+          <h3>Синхронизируй</h3>
+          <p>Операция сразу сохраняется на устройстве и уходит на сервер. Без сети — ждёт в очереди и отправляется сама.</p>
+          <div class="footnote">Room · WorkManager · автоповтор</div>
+        </div>
+      </div>
+      <div class="facts">
+        <div class="fact"><b>0 ₽</b><span>за устройство — подойдёт любой смартфон</span></div>
+        <div class="fact"><b>11</b><span>форматов штрихкодов «из коробки»</span></div>
+        <div class="fact"><b>офлайн</b><span>учёт не зависит от Wi-Fi</span></div>
+        <div class="fact"><b>6</b><span>экранов, понятных без обучения</span></div>
+      </div>
+      <div class="foot"><span>Решение</span><span class="line"></span><b>03 / 14</b></div>
+    </section>
+
+    <!-- ================= 04 SCREENS 1 ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Интерфейс · сканирование</span>
+      </div>
+      <div class="kicker">Экраны приложения</div>
+      <h2>Сканер, который всегда в кармане</h2>
+      <div class="shots">
+        <div class="shot"><img src="assets/screens/scanner.png" alt="Сканер"><div class="cap"><b>Сканер</b><span>Камера, рамка и подсказки. Тёмная тема не слепит в цеху.</span></div></div>
+        <div class="shot"><img src="assets/screens/scan-result.png" alt="Карточка после сканирования"><div class="cap"><b>Результат сканирования</b><span>Товар, остаток и действие — в одном нижнем листе.</span></div></div>
+        <div class="shot"><img src="assets/screens/stock.png" alt="Остатки"><div class="cap"><b>Остатки</b><span>Стоимость запасов, фильтры и список позиций.</span></div></div>
+      </div>
+      <div class="foot"><span>Интерфейс</span><span class="line"></span><b>04 / 14</b></div>
+    </section>
+
+    <!-- ================= 05 SCREENS 2 ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Интерфейс · учёт</span>
+      </div>
+      <div class="kicker">Экраны приложения</div>
+      <h2>Каждое движение — в истории</h2>
+      <div class="shots four">
+        <div class="shot"><img src="assets/screens/product.png" alt="Карточка товара"><div class="cap"><b>Карточка товара</b><span>Остаток, минимум, стоимость и все операции по SKU.</span></div></div>
+        <div class="shot"><img src="assets/screens/history.png" alt="История операций"><div class="cap"><b>История</b><span>Очередь отправки, фильтры и хронология движений.</span></div></div>
+        <div class="shot"><img src="assets/screens/analytics.png" alt="Аналитика"><div class="cap"><b>Сводка</b><span>Стоимость запасов, динамика за неделю и дефицит.</span></div></div>
+        <div class="shot"><img src="assets/screens/settings.png" alt="Настройки"><div class="cap"><b>Настройки</b><span>Адрес API, демо-режим, звук и вибрация, темы.</span></div></div>
+      </div>
+      <div class="foot"><span>Интерфейс</span><span class="line"></span><b>05 / 14</b></div>
+    </section>
+
+    <!-- ================= 06 FEATURES ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Возможности</span>
+      </div>
+      <div class="kicker">Что уже работает</div>
+      <h2>Не прототип, а собранное приложение</h2>
+      <div class="features">
+        <div class="feature">
+          <div class="fh"><div class="fi" style="background:rgba(198,255,74,.12);color:var(--lime)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div><h3>Камера вместо ТСД</h3></div>
+          <p>EAN-13, EAN-8, Code 128/39/93, QR, Data Matrix, UPC-A/E, ITF, PDF417. Распознавание на устройстве — кадры никуда не уходят.</p>
+          <div class="ftag">CameraX · ML Kit · 11 форматов</div>
+        </div>
+        <div class="feature">
+          <div class="fh"><div class="fi" style="background:rgba(255,194,75,.12);color:var(--amber)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 18a3.5 3.5 0 0 1-.4-7A5 5 0 0 1 16 9.5a3.5 3.5 0 0 1 .5 7"/><path d="M12 12v6M9.5 15.5 12 18l2.5-2.5"/></svg></div><h3>Offline-first</h3></div>
+          <p>Room — источник правды. Каждая операция попадает в очередь и уходит на сервер, когда появляется сеть. WorkManager повторяет отправку.</p>
+          <div class="ftag">Room · WorkManager · retry</div>
+        </div>
+        <div class="feature">
+          <div class="fh"><div class="fi" style="background:rgba(99,230,255,.12);color:var(--cyan)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11.2 14 15.5 9M7 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2Z"/></svg></div><h3>Учёт без ошибок</h3></div>
+          <p>Приход, списание и инвентаризация. Проверка остатка, запрет отрицательных значений, полная история по каждому товару.</p>
+          <div class="ftag">StockMath · валидация · история</div>
+        </div>
+        <div class="feature">
+          <div class="fh"><div class="fi" style="background:rgba(182,156,255,.14);color:var(--violet)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18V9M9.3 18V5M14.7 18v-6M20 18v-9"/></svg></div><h3>Аналитика</h3></div>
+          <p>Стоимость запасов, движение за 7 дней, дефицит по минимумам и структура категорий. Всё считается локально.</p>
+          <div class="ftag">Compose Canvas · Flow</div>
+        </div>
+        <div class="feature">
+          <div class="fh"><div class="fi" style="background:rgba(255,107,122,.12);color:var(--coral)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></div><h3>Настройки под склад</h3></div>
+          <p>Адрес API, демо-режим, звук и вибрация, непрерывное сканирование, три темы. Всё меняется без пересборки.</p>
+          <div class="ftag">DataStore · 3 темы · API URL</div>
+        </div>
+        <div class="feature">
+          <div class="fh"><div class="fi" style="background:rgba(123,240,180,.12);color:var(--mint)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h10M4 17h7"/></svg></div><h3>Демо из коробки</h3></div>
+          <p>20 реальных складских позиций с валидными EAN-13 и 30 операций. Приложение можно запустить и показать без сервера.</p>
+          <div class="ftag">20 SKU · 30 операций · 0 настройки</div>
+        </div>
+      </div>
+      <div class="foot"><span>Возможности</span><span class="line"></span><b>06 / 14</b></div>
+    </section>
+
+    <!-- ================= 07 PERSONAS ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Кому подходит</span>
+      </div>
+      <div class="kicker">Позиционирование</div>
+      <h2>Для тех, у кого склад меньше, чем ERP</h2>
+      <p class="lead">Небольшие склады и участки, где нужен быстрый учёт, а не полугодовое внедрение.</p>
+      <div class="personas">
+        <div class="persona"><div class="pn">01</div><div><b>Небольшой склад и даркстор</b><p>1–5 кладовщиков, сотни SKU. Нужны остатки, приёмка и списания без покупки ТСД.</p></div></div>
+        <div class="persona"><div class="pn">02</div><div><b>Производственный участок</b><p>Выдача в цех и расходники. Важно быстро списать и видеть, что осталось.</p></div></div>
+        <div class="persona"><div class="pn">03</div><div><b>Мобильная торговля</b><p>Выездной агент или курьер: остатки, приёмка и пересчёт прямо на телефоне.</p></div></div>
+        <div class="persona"><div class="pn">04</div><div><b>Пилот перед автоматизацией</b><p>Проверить процесс, данные и дисциплину до покупки терминалов и лицензий.</p></div></div>
+      </div>
+      <div class="notfor"><b>Когда не подойдёт:</b> партии и сроки годности, RFID, весы, печать этикеток, обмен документами с 1С «из коробки». Это задачи другого класса — и другого бюджета.</div>
+      <div class="closing">Цель — не заменить ERP, а <b>убрать разрыв</b> между полкой и учётной системой.</div>
+      <div class="foot"><span>Кому подходит</span><span class="line"></span><b>07 / 14</b></div>
+    </section>
+
+    <!-- ================= 08 ARCHITECTURE ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Архитектура</span>
+      </div>
+      <div class="kicker">Как это устроено</div>
+      <h2>Офлайн — не режим, а основа</h2>
+      <div class="arch">
+        <div class="stack">
+          <div class="layer lime"><span class="lh">UI</span><b>Jetpack Compose · MVVM</b><span>6 экранов, 5 вкладок</span></div>
+          <div class="connector">событие</div>
+          <div class="layer"><span class="lh">Домен</span><b>Repository · StockMath</b><span>валидация и правила учёта</span></div>
+          <div class="connector">Flow</div>
+          <div class="split">
+            <div class="layer"><span class="lh" style="width:auto">Room</span><b>локальный кэш</b><span>источник правды</span></div>
+            <div class="layer"><span class="lh" style="width:auto">Sync</span><b>Retrofit · WorkManager</b><span>очередь и ретраи</span></div>
+          </div>
+          <div class="connector">batch / retry</div>
+          <div class="layer"><span class="lh">API</span><b>REST · 1С · ERP</b><span>внешний контур</span></div>
+        </div>
+        <div class="note-list">
+          <div class="note"><span class="nd"></span><div><b>Room — единственный источник правды</b><p>UI читает только локальные данные. Сервер не нужен, чтобы показать остаток или провести операцию.</p></div></div>
+          <div class="note"><span class="nd"></span><div><b>Очередь операций</b><p>Каждая операция хранится с clientOpId и статусом. Повторная отправка не создаёт дубль.</p></div></div>
+          <div class="note"><span class="nd"></span><div><b>Синхронизация фоном</b><p>WorkManager и NetworkMonitor поднимают отправку при появлении сети. Ошибка не теряет данные.</p></div></div>
+          <div class="note"><span class="nd"></span><div><b>Демо-режим</b><p>REST эмулируется на устройстве: приложение можно показать и протестировать без бэкенда.</p></div></div>
+        </div>
+      </div>
+      <div class="lifecycle">
+        <div class="lt">Путь<br>операции</div>
+        <div class="lcstep"><b>Сканирование</b><span>камера → EAN</span></div>
+        <div class="lcarrow">→</div>
+        <div class="lcstep"><b>Товар найден</b><span>Room, локально</span></div>
+        <div class="lcarrow">→</div>
+        <div class="lcstep hot"><b>Операция</b><span>PENDING в очереди</span></div>
+        <div class="lcarrow">→</div>
+        <div class="lcstep"><b>Отправка</b><span>Retrofit, при сети</span></div>
+        <div class="lcarrow">→</div>
+        <div class="lcstep"><b>Синхронизировано</b><span>сервер + локально</span></div>
+      </div>
+      <div class="foot"><span>Архитектура</span><span class="line"></span><b>08 / 14</b></div>
+    </section>
+
+    <!-- ================= 09 ALTERNATIVES ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Альтернативы</span>
+      </div>
+      <div class="kicker">С кем сравниваем</div>
+      <h2>Рынок не пустой — и это хорошо</h2>
+      <div class="alts">
+        <div class="alt us">
+          <div class="at"><span class="tag" style="color:var(--lime);border-color:rgba(198,255,74,.35)">наш проект</span></div>
+          <h3>СкладСкан</h3>
+          <p>Мобильный клиент для быстрых операций: камера, офлайн-очередь, понятный интерфейс, открытый код.</p>
+          <div class="price">Стоимость: <b>0 ₽</b> · запуск: <b>один вечер</b></div>
+        </div>
+        <div class="alt">
+          <div class="at"><span class="tag">1С</span></div>
+          <h3>1С:Мобильная касса</h3>
+          <p>Мобильное приложение экосистемы 1С. Сильная сторона — обмен с уже работающей базой 1С.</p>
+          <div class="price">Цена: <b>от ~15 тыс. ₽</b> + лицензии и настройка</div>
+        </div>
+        <div class="alt">
+          <div class="at"><span class="tag">enterprise</span></div>
+          <h3>Cleverence MobileSMARTS</h3>
+          <p>Промышленная платформа складской автоматизации: ТСД, RFID, 1С, сложные сценарии.</p>
+          <div class="price">Цена: <b>от ~50 тыс. ₽</b> за внедрение</div>
+        </div>
+        <div class="alt">
+          <div class="at"><span class="tag">учёт</span></div>
+          <h3>Гектор:Склад</h3>
+          <p>Учёт и инвентаризация с быстрым стартом и обменом данными. Ближе к учётной системе, чем к сканеру.</p>
+          <div class="price">Цена: <b>модули от ~10 тыс. ₽</b></div>
+        </div>
+        <div class="alt">
+          <div class="at"><span class="tag">retail</span></div>
+          <h3>Штрих-М</h3>
+          <p>Комплексная автоматизация торговли и склада: ПО, оборудование, внедрение и поддержка.</p>
+          <div class="price">Цена: <b>по проекту</b></div>
+        </div>
+        <div class="alt">
+          <div class="at"><span class="tag">бесплатно</span></div>
+          <h3>Excel и бумага</h3>
+          <p>Ноль затрат и полная гибкость. Но нет сканирования, истории и синхронизации — только ручной труд.</p>
+          <div class="price">Цена: <b>0 ₽</b> · цена ошибки — ваша</div>
+        </div>
+      </div>
+      <div class="src">Цены — ориентир по открытым прайсам на ноябрь 2026. Точная стоимость зависит от сценариев и внедрения.</div>
+      <div class="foot"><span>Альтернативы</span><span class="line"></span><b>09 / 14</b></div>
+    </section>
+
+    <!-- ================= 10 TABLE ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Сравнение</span>
+      </div>
+      <div class="kicker">Честное сравнение</div>
+      <h2>Сильные и слабые места — рядом</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Критерий</th>
+              <th class="us">СкладСкан</th>
+              <th>1С</th>
+              <th>Cleverence</th>
+              <th>Гектор</th>
+              <th>Штрих-М</th>
+              <th>Excel</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Цена входа</td><td class="us">0 ₽</td><td>от 15 т.₽</td><td>от 50 т.₽</td><td>от 10 т.₽</td><td>по проекту</td><td>0 ₽</td></tr>
+            <tr><td>Запуск без интегратора</td><td class="us"><span class="yes">✓</span></td><td><span class="no">—</span></td><td><span class="no">—</span></td><td><span class="part">~</span></td><td><span class="no">—</span></td><td><span class="yes">✓</span></td></tr>
+            <tr><td>Сканирование камерой телефона</td><td class="us"><span class="yes">✓</span></td><td><span class="part">~</span></td><td><span class="part">~</span></td><td><span class="part">~</span></td><td><span class="part">~</span></td><td><span class="no">—</span></td></tr>
+            <tr><td>Офлайн-очередь операций</td><td class="us"><span class="yes">✓</span></td><td><span class="part">~</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="part">~</span></td><td><span class="no">—</span></td></tr>
+            <tr><td>Интеграция с 1С / ERP</td><td class="us"><span class="no">—</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="part">~</span></td><td><span class="yes">✓</span></td><td><span class="no">—</span></td></tr>
+            <tr><td>ТСД, RFID, весы</td><td class="us"><span class="no">—</span></td><td><span class="part">~</span></td><td><span class="yes">✓</span></td><td><span class="part">~</span></td><td><span class="yes">✓</span></td><td><span class="no">—</span></td></tr>
+            <tr><td>Печать этикеток</td><td class="us"><span class="no">—</span></td><td><span class="part">~</span></td><td><span class="yes">✓</span></td><td><span class="part">~</span></td><td><span class="yes">✓</span></td><td><span class="no">—</span></td></tr>
+            <tr><td>Роли, аудит, партии</td><td class="us"><span class="no">—</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="part">~</span></td><td><span class="yes">✓</span></td><td><span class="no">—</span></td></tr>
+            <tr><td>Поддержка и SLA</td><td class="us"><span class="no">—</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">—</span></td></tr>
+            <tr><td>Открытый код</td><td class="us"><span class="yes">✓</span></td><td><span class="no">—</span></td><td><span class="no">—</span></td><td><span class="no">—</span></td><td><span class="no">—</span></td><td><span class="yes">✓</span></td></tr>
+            <tr><td>Современный интерфейс</td><td class="us"><span class="yes">✓</span></td><td><span class="part">~</span></td><td><span class="part">~</span></td><td><span class="no">—</span></td><td><span class="no">—</span></td><td><span class="no">—</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="legend"><span><b class="yes">✓</b> есть «из коробки»</span><span><b class="part">~</b> частично или за доплату</span><span><b class="no">—</b> нет</span></div>
+      <div class="foot"><span>Сравнение</span><span class="line"></span><b>10 / 14</b></div>
+    </section>
+
+    <!-- ================= 11 STRENGTHS ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Где мы сильнее</span>
+      </div>
+      <div class="kicker">Наши преимущества</div>
+      <h2>Быстрее начать.<br><span class="dim">Дешевле владеть.</span></h2>
+      <div class="strs">
+        <div class="strlist">
+          <div class="str"><div class="sn">01</div><div><b>Старт за один вечер</b><p>APK, адрес API и демо-данные. Не нужен интегратор, чтобы увидеть рабочий сценарий.</p></div></div>
+          <div class="str"><div class="sn">02</div><div><b>Ноль затрат на железо</b><p>Любой Android 8+ с камерой. Не нужно покупать ТСД и лицензию на каждое устройство.</p></div></div>
+          <div class="str"><div class="sn">03</div><div><b>Учёт не встаёт без сети</b><p>Операция сохраняется локально и уходит на сервер позже. Смена не зависит от Wi-Fi.</p></div></div>
+          <div class="str"><div class="sn">04</div><div><b>Понятно с первого экрана</b><p>Три действия и крупные цифры. Обучение кладовщика — минуты, а не дни.</p></div></div>
+          <div class="str"><div class="sn">05</div><div><b>Полный контроль</b><p>Kotlin и Compose, открытый исходник. Можно доработать под свой процесс, а не ждать вендора.</p></div></div>
+        </div>
+        <div class="statcard">
+          <div><div class="big">0 ₽</div><div class="cap">за устройство: телефон уже есть у каждого кладовщика</div></div>
+          <div class="div"></div>
+          <div><div class="big">≈15 мин</div><div class="cap">от установки APK до первой проведённой операции</div></div>
+          <div class="div"></div>
+          <div><div class="big">43 МБ</div><div class="cap">размер debug-сборки — без тяжёлых SDK и облака</div></div>
+        </div>
+      </div>
+      <div class="foot"><span>Преимущества</span><span class="line"></span><b>11 / 14</b></div>
+    </section>
+
+    <!-- ================= 12 WEAKNESSES ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Где сильнее они</span>
+      </div>
+      <div class="kicker">Без иллюзий</div>
+      <h2>Чего у нас пока нет</h2>
+      <p class="lead">Конкуренты выигрывают там, где начинается промышленный склад и корпоративные процессы.</p>
+      <div class="weak">
+        <div class="w"><b><i></i>Интеграции</b><p>Нет готового обмена с 1С и ERP: нужен API или адаптер под конкретную систему.</p></div>
+        <div class="w"><b><i></i>Оборудование</b><p>Не управляет ТСД, RFID, весами и принтерами этикеток.</p></div>
+        <div class="w"><b><i></i>Складские процессы</b><p>Нет партий, сроков годности, адресного хранения, ролей и аудита действий.</p></div>
+        <div class="w"><b><i></i>Масштаб</b><p>Нет централизованного развёртывания и управления сотнями устройств.</p></div>
+        <div class="w"><b><i></i>Поддержка</b><p>Нет SLA, сертификации, вендорского внедрения и обучения.</p></div>
+        <div class="w"><b><i></i>Зрелость</b><p>Проект новый: меньше сценариев и накопленного опыта, чем у вендоров с историей.</p></div>
+      </div>
+      <div class="honest">Мы не заменяем ERP и не спорим с ТСД. <b>Мы закрываем последнюю милю</b> — быструю и честную операцию у полки.</div>
+      <div class="foot"><span>Ограничения</span><span class="line"></span><b>12 / 14</b></div>
+    </section>
+
+    <!-- ================= 13 TECH ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Технологии</span>
+      </div>
+      <div class="kicker">Под капотом</div>
+      <h2>Современный Android-стек</h2>
+      <div class="tech">
+        <div class="techlist">
+          <div class="trow"><span class="ti">K</span><b>Kotlin 2.0 · Coroutines · Flow</b><span>асинхронность и реактивные данные</span></div>
+          <div class="trow"><span class="ti">C</span><b>Jetpack Compose · Material 3</b><span>декларативный UI, свои компоненты</span></div>
+          <div class="trow"><span class="ti">◉</span><b>CameraX · ML Kit Barcode</b><span>сканирование на устройстве</span></div>
+          <div class="trow"><span class="ti">R</span><b>Room · KSP · DataStore</b><span>локальная база и настройки</span></div>
+          <div class="trow"><span class="ti">↔</span><b>Retrofit · OkHttp · Gson</b><span>REST-клиент и логирование</span></div>
+          <div class="trow"><span class="ti">W</span><b>WorkManager · NetworkMonitor</b><span>фоновая синхронизация</span></div>
+          <div class="trow"><span class="ti">M</span><b>MVVM · ручной DI</b><span>без Hilt — проще собирать</span></div>
+          <div class="trow"><span class="ti">✓</span><b>Unit-тесты · demo mode</b><span>правила учёта проверяются</span></div>
+        </div>
+        <div class="build">
+          <div class="card">
+            <div class="kv"><span>Сборка</span><b>debug APK · 43 МБ</b></div>
+            <div class="kv"><span>Минимальная версия</span><b>Android 8.0 · API 26</b></div>
+            <div class="kv"><span>Целевая версия</span><b>Android 14 · API 34</b></div>
+            <div class="kv"><span>Экраны</span><b>6 · 5 вкладок</b></div>
+            <div class="kv"><span>Тесты</span><b>StockMath · 11 кейсов</b></div>
+          </div>
+          <div class="card">
+            <div style="font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);font-weight:800">Дизайн-система</div>
+            <div style="font-size:12px;margin-top:8px;line-height:1.5;color:var(--dim)">Manrope, тёмный «чернильный» фон, лаймовый акцент. Кастомные графики и нижняя навигация — без стокового Material-вида.</div>
+            <div class="palette">
+              <div class="sw" style="background:#070A0F;border:1px solid rgba(255,255,255,.15)"></div>
+              <div class="sw" style="background:#101722"></div>
+              <div class="sw" style="background:#C6FF4A"></div>
+              <div class="sw" style="background:#7BF0B4"></div>
+              <div class="sw" style="background:#63E6FF"></div>
+              <div class="sw" style="background:#FFC24B"></div>
+              <div class="sw" style="background:#FF6B7A"></div>
+            </div>
+          </div>
+          <div class="card" style="padding:16px 18px">
+            <div style="font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);font-weight:800">Сборка из исходников</div>
+            <div class="mono">./gradlew :app:assembleDebug</div>
+            <div class="mono">./gradlew :app:testDebugUnitTest</div>
+            <div class="kv" style="margin-top:2px"><span>JDK для сборки</span><b>17 · 21</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span>Технологии</span><span class="line"></span><b>13 / 14</b></div>
+    </section>
+
+    <!-- ================= 14 FINAL ================= -->
+    <section class="slide">
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg></div>
+        <span class="brand">СКЛАДСКАН</span>
+        <span class="sec">Исходный код</span>
+      </div>
+      <div class="final">
+        <div>
+          <div class="kicker">Итог</div>
+          <h2>Быстрый учёт<br><span class="dim">у каждой полки.</span></h2>
+          <p class="lead">Приложение собирается, работает без сервера и решает конкретную задачу: сделать складскую операцию такой же простой, как скан QR-кода.</p>
+          <div class="next">
+            <div class="l">Что дальше</div>
+            <p>Адаптер к 1С, печать этикеток, роли и права, партии и сроки годности, централизованное обновление.</p>
+          </div>
+          <div class="thanks">Спасибо за внимание</div>
+        </div>
+        <div class="gh-card">
+          <div class="gh-top">
+            <div class="gh-icon">
+              <svg width="28" height="28" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+            </div>
+            <div>
+              <div class="l">GitHub</div>
+              <div class="s">Код, инструкция запуска и APK</div>
+            </div>
+          </div>
+          <!-- ССЫЛКА НА GITHUB: замените href и текст ниже на адрес репозитория -->
+          <!-- затем перегенерируйте QR: python tools/make_qr.py https://github.com/username/repo -->
+          <a class="gh-url" href="https://github.com/username/skladscan" target="_blank" rel="noopener" id="gh-link" data-placeholder="https://github.com/username/skladscan">github.com/username/skladscan</a>
+          <div class="gh-note">Ваш репозиторий: <b>вставьте ссылку в текст и в href этого блока</b>, затем пересоберите QR командой <span style="color:var(--dim)">tools\make_qr.bat https://github.com/username/repo</span>.</div>
+          <div class="qrwrap"><img src="assets/qr-github.png" alt="QR-код на репозиторий"><span>Проект</span></div>
+        </div>
+      </div>
+      <div class="foot"><span>СкладСкан · 2026</span><span class="line"></span><b>14 / 14</b></div>
+    </section>
+
+  </div>
+</div>
+
+<div id="progress"></div>
+<div class="hint"><span>← → листать</span><span>Home / End</span></div>
+<div class="nav">
+  <button id="prev" aria-label="Назад">‹</button>
+  <button id="next" aria-label="Вперёд">›</button>
+</div>
+
+<script>
+  (function () {
+    var deck = document.getElementById('deck');
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var progress = document.getElementById('progress');
+    var index = 0;
+
+    function fit() {
+      var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+      deck.style.transform = 'scale(' + s + ')';
+    }
+
+    function show(n) {
+      index = Math.max(0, Math.min(slides.length - 1, n));
+      slides.forEach(function (s, i) { s.classList.toggle('active', i === index); });
+      progress.style.width = ((index + 1) / slides.length * 100) + '%';
+      try { history.replaceState(null, '', '#' + (index + 1)); } catch (e) {}
+    }
+
+    function next() { show(index + 1); }
+    function prev() { show(index - 1); }
+
+    window.addEventListener('resize', fit);
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault(); next();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault(); prev();
+      } else if (e.key === 'Home') { e.preventDefault(); show(0); }
+      else if (e.key === 'End') { e.preventDefault(); show(slides.length - 1); }
+    });
+
+    document.getElementById('next').addEventListener('click', next);
+    document.getElementById('prev').addEventListener('click', prev);
+
+    var start = parseInt((location.hash || '').replace('#', ''), 10);
+    if (/[?&]clean=1/.test(location.search)) document.body.classList.add('clean');
+    fit();
+    show(isNaN(start) ? 0 : start - 1);
+
+    var movingTimer;
+    window.addEventListener('mousemove', function () {
+      document.body.classList.add('moving');
+      clearTimeout(movingTimer);
+      movingTimer = setTimeout(function () {
+        document.body.classList.remove('moving');
+      }, 2200);
+    });
+  })();
+</script>
+</body>
+</html>

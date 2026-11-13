@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>СкладСкан — макеты экранов</title>
+<style>
+  @font-face{font-family:Manrope;src:url('./assets/manrope.ttf') format('truetype');font-weight:200 800;font-display:block}
+  :root{
+    --ink:#070A0F; --elev:#0C121B; --surface:#101722; --surface2:#17212F;
+    --stroke:rgba(255,255,255,.10); --stroke2:rgba(255,255,255,.06);
+    --text:#F2F6E9; --dim:#98A4B2; --muted:#697585;
+    --lime:#C6FF4A; --mint:#7BF0B4; --cyan:#63E6FF; --amber:#FFC24B; --coral:#FF6B7A; --violet:#B69CFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#080B10;font-family:Manrope,system-ui,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+  .stage{display:flex;flex-wrap:wrap;gap:56px;padding:56px;justify-content:center;align-items:flex-start;width:max-content}
+  .phone{width:390px;height:844px;border-radius:46px;background:var(--ink);position:relative;overflow:hidden;
+    border:1px solid rgba(255,255,255,.09);box-shadow:0 40px 90px rgba(0,0,0,.65),0 0 0 8px #0b0e13;flex:none}
+  .status{position:absolute;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;
+    padding:6px 26px 0;font-size:13px;font-weight:800;z-index:60;letter-spacing:.2px}
+  .sicons{display:flex;gap:6px;align-items:center;opacity:.9}
+  .sicons svg{display:block}
+
+  /* ---------- common ---------- */
+  .pad{padding:0 20px}
+  .eyebrow{font-size:9.5px;font-weight:800;letter-spacing:1.9px;text-transform:uppercase;color:var(--muted)}
+  .title{font-size:28px;font-weight:800;letter-spacing:-.7px;line-height:32px;margin-top:4px}
+  .sub{font-size:13px;line-height:18px;color:var(--dim);margin-top:6px}
+  .card{background:var(--surface);border:1px solid var(--stroke);border-radius:24px}
+  .row{display:flex;align-items:center}
+  .grow{flex:1;min-width:0}
+  .dimtext{color:var(--dim)}
+  .mutedtext{color:var(--muted)}
+  svg{display:block}
+
+  .synchip{display:flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;
+    background:rgba(99,230,255,.08);border:1px solid rgba(99,230,255,.18);color:var(--cyan);font-size:10px;font-weight:800;letter-spacing:.2px}
+  .synchip .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+  .roundbtn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;
+    background:var(--surface);border:1px solid var(--stroke);color:var(--text)}
+  .roundbtn.lime{background:rgba(198,255,74,.10);border-color:rgba(198,255,74,.25);color:var(--lime)}
+
+  .search{display:flex;align-items:center;gap:10px;height:50px;padding:0 15px;border-radius:15px;background:var(--surface);
+    border:1px solid var(--stroke);color:var(--muted);font-size:13px}
+
+  .pillrow{display:flex;gap:8px}
+  .fpill{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:999px;background:var(--surface);
+    border:1px solid var(--stroke);font-size:11px;font-weight:700;color:var(--dim);white-space:nowrap}
+  .fpill .c{font-size:9px;font-weight:800;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 5px;border-radius:999px}
+  .fpill.on{background:var(--lime);border-color:var(--lime);color:#101505}
+
+  .prod{display:flex;align-items:center;gap:12px;padding:14px;border-radius:20px;background:var(--surface);border:1px solid var(--stroke)}
+  .prod .avatar{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-weight:800;font-size:18px;flex:none}
+  .prod .nm{font-size:13px;font-weight:700;line-height:17px;color:var(--text);letter-spacing:-.1px}
+  .prod .meta{font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px}
+  .badge{font-size:9.5px;font-weight:800;padding:4px 7px;border-radius:999px;white-space:nowrap}
+  .badge.ok{color:var(--lime);background:rgba(198,255,74,.12)}
+  .badge.low{color:var(--amber);background:rgba(255,194,75,.12)}
+  .badge.out{color:var(--coral);background:rgba(255,107,122,.12)}
+
+  /* ---------- bottom nav ---------- */
+  .tabbar{position:absolute;left:14px;right:14px;bottom:8px;height:64px;border-radius:28px;background:#101722;
+    border:1px solid var(--stroke);display:flex;align-items:center;z-index:50;box-shadow:0 22px 44px rgba(0,0,0,.6)}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:8.5px;font-weight:800;letter-spacing:.1px}
+  .tab.on{color:var(--lime)}
+  .tab.on .ind{width:14px;height:3px;border-radius:999px;background:var(--lime)}
+  .tab .ind{width:0;height:3px;border-radius:999px;background:transparent}
+  .tab svg{width:21px;height:21px}
+  .scanfab{position:absolute;left:50%;top:744px;transform:translateX(-50%);width:66px;height:66px;border-radius:50%;
+    background:var(--elev);border:1px solid var(--stroke);display:grid;place-items:center;z-index:60;
+    box-shadow:0 18px 40px rgba(0,0,0,.5)}
+  .scanfab .in{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--mint));
+    display:grid;place-items:center;color:#101505;box-shadow:0 10px 26px rgba(198,255,74,.25)}
+
+  /* ---------- scanner ---------- */
+  .camera{position:absolute;inset:0;background:
+    radial-gradient(120% 85% at 18% 4%,#22303e 0%,transparent 58%),
+    radial-gradient(90% 60% at 92% 82%,#16232e 0%,transparent 55%),
+    linear-gradient(180deg,#0a1017,#05080c 70%)}
+  .shelf{position:absolute;left:-10%;right:-10%;height:120px;border-radius:14px;
+    background:linear-gradient(180deg,rgba(60,78,96,.32),rgba(20,28,36,.1));filter:blur(2px)}
+  .labelcard{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%) rotate(-3deg);width:224px;padding:14px 16px 12px;
+    border-radius:7px;background:linear-gradient(160deg,#f6f1e5,#ded7c6);
+    box-shadow:0 28px 60px rgba(0,0,0,.62),inset 0 1px 0 #fff}
+  .labelcard .bc{height:62px;border-radius:2px;
+    background:repeating-linear-gradient(90deg,#15140f 0 2px,transparent 2px 5px,#15140f 5px 9px,transparent 9px 11px,#15140f 11px 12px,transparent 12px 15px)}
+  .labelcard .bcnum{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:4.5px;color:#2a2620;text-align:center;margin-top:7px}
+  .labelcard .bcname{font-size:10px;font-weight:700;color:#6b6455;text-align:center;margin-top:3px;letter-spacing:.2px}
+  .box3d{position:absolute;left:80%;top:56%;width:270px;height:180px;transform:translate(-50%,-50%) rotate(5deg);
+    border-radius:8px;background:linear-gradient(150deg,#4a3c2b,#241d15);
+    filter:blur(4px) brightness(.5)}
+  .vignette{position:absolute;inset:0;background:
+    radial-gradient(ellipse 220px 140px at 50% 46%,transparent 55%,rgba(0,0,0,.34) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.72),transparent 22%,transparent 62%,rgba(0,0,0,.82))}
+  .camtop{position:absolute;top:46px;left:0;right:0;padding:10px 20px;display:flex;align-items:center;z-index:30}
+  .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--lime),var(--mint));
+    display:grid;place-items:center;color:#101505;flex:none;box-shadow:0 8px 20px rgba(198,255,74,.18)}
+  .brand{font-size:9.5px;font-weight:800;letter-spacing:1.8px}
+  .brand-sub{font-size:11px;color:var(--dim);margin-top:1px}
+  .torch{width:40px;height:40px;border-radius:50%;background:rgba(16,23,34,.75);border:1px solid var(--stroke);
+    display:grid;place-items:center;color:var(--text);margin-left:8px}
+
+  .frame{position:absolute;left:31px;top:299px;width:328px;height:210px;border-radius:24px;z-index:20}
+  .frame .edge{position:absolute;inset:0;border-radius:24px;border:1.5px solid rgba(198,255,74,.20)}
+  .frame .c{position:absolute;width:26px;height:26px;border:3px solid var(--lime);border-radius:3px}
+  .frame .c1{left:2px;top:2px;border-right:0;border-bottom:0;border-top-left-radius:10px}
+  .frame .c2{right:2px;top:2px;border-left:0;border-bottom:0;border-top-right-radius:10px}
+  .frame .c3{left:2px;bottom:2px;border-right:0;border-top:0;border-bottom-left-radius:10px}
+  .frame .c4{right:2px;bottom:2px;border-left:0;border-top:0;border-bottom-right-radius:10px}
+  .scanline{position:absolute;left:18px;right:18px;top:96px;height:1.5px;
+    background:linear-gradient(90deg,transparent,rgba(198,255,74,.85),transparent);
+    box-shadow:0 0 26px 10px rgba(198,255,74,.10)}
+  .frame .lbl{position:absolute;left:2px;top:-23px;font-size:9px;font-weight:800;letter-spacing:1.6px;color:rgba(198,255,74,.75)}
+
+  .hints{position:absolute;left:24px;right:24px;bottom:104px;display:flex;flex-direction:column;align-items:center;z-index:30}
+  .hintpill{display:flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:999px;
+    background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);font-size:13px;font-weight:800;color:#fff}
+  .hintpill .dot{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px var(--lime)}
+  .formats{font-size:11px;color:rgba(255,255,255,.55);margin-top:7px}
+  .ghostbtn{margin-top:16px;height:46px;width:100%;border-radius:15px;border:1px solid rgba(255,255,255,.28);
+    display:flex;align-items:center;justify-content:center;gap:9px;font-size:14px;font-weight:800;color:#fff;background:rgba(255,255,255,.04)}
+
+  /* ---------- sheet over scanner ---------- */
+  .sheet-bg{position:absolute;inset:0;background:linear-gradient(180deg,#0f1822,#070b10)}
+  .sheet-dim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:10}
+  .sheet{position:absolute;left:0;right:0;bottom:96px;background:var(--surface);border:1px solid var(--stroke);
+    border-radius:30px 30px 0 0;padding:10px 20px 18px;z-index:40;box-shadow:0 -24px 60px rgba(0,0,0,.5)}
+  .handle{width:38px;height:4px;border-radius:999px;background:rgba(105,117,133,.5);margin:0 auto 12px}
+  .fmt{font-size:9.5px;font-weight:800;letter-spacing:.6px;color:var(--lime);background:rgba(198,255,74,.12);
+    padding:5px 9px;border-radius:999px}
+  .closeb{width:32px;height:32px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;color:var(--dim)}
+  .pname{font-size:19px;font-weight:700;letter-spacing:-.3px;line-height:24px;margin-top:13px}
+  .pmeta{font-size:11.5px;color:var(--dim);margin-top:5px}
+  .price{font-size:13px;font-weight:700;color:var(--text)}
+  .stocknum{font-size:40px;font-weight:800;letter-spacing:-1.4px;line-height:42px}
+  .minit{font-size:10.5px;font-weight:700;color:var(--muted)}
+  .bar{height:6px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:9px}
+  .bar>i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--mint),var(--lime))}
+  .actrow{display:flex;gap:8px;margin-top:8px}
+  .act{flex:1;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;gap:6px;
+    background:var(--surface2);border:1px solid var(--stroke);font-size:11.5px;font-weight:800;color:var(--dim)}
+  .act.on{background:var(--lime);border-color:var(--lime);color:#101505}
+  .stepper{display:flex;align-items:center;height:56px;border-radius:16px;background:var(--surface2);border:1px solid var(--stroke);margin-top:8px}
+  .stepper .b{width:52px;height:100%;display:grid;place-items:center;color:var(--dim)}
+  .stepper .v{flex:1;text-align:center;font-size:20px;font-weight:800}
+  .stepper .u{font-size:12px;font-weight:700;color:var(--dim);margin-left:4px}
+  .cta{height:54px;border-radius:16px;background:linear-gradient(135deg,var(--lime),var(--mint));color:#101505;
+    display:flex;align-items:center;justify-content:center;gap:9px;font-size:14.5px;font-weight:800;margin-top:16px;
+    box-shadow:0 14px 30px rgba(198,255,74,.18)}
+  .caption{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:15px}
+
+  /* ---------- stock ---------- */
+  .hero{position:relative;overflow:hidden;border:1px solid rgba(198,255,74,.22);border-radius:26px;
+    background:linear-gradient(120deg,rgba(198,255,74,.16),var(--surface) 55%,var(--surface));padding:18px}
+  .hero .glow{position:absolute;right:-30px;top:-50px;width:170px;height:170px;border-radius:50%;
+    background:radial-gradient(circle,rgba(198,255,74,.22),transparent 70%)}
+  .hero .lbl{font-size:9.5px;font-weight:800;letter-spacing:1.3px;color:var(--lime)}
+  .bigval{font-size:34px;font-weight:800;letter-spacing:-1.1px;line-height:38px;margin-top:5px}
+  .todaychip{font-size:9.5px;font-weight:800;color:var(--dim);background:rgba(255,255,255,.05);padding:4px 8px;border-radius:999px}
+  .ministat{display:flex;flex-direction:column;gap:2px}
+  .ministat b{font-size:18px;font-weight:800;letter-spacing:-.3px}
+  .ministat span{font-size:11px;color:var(--muted)}
+  .divider{height:1px;background:var(--stroke)}
+  .sectionhead{display:flex;align-items:baseline;gap:8px}
+  .sectionhead h3{font-size:15px;font-weight:800;letter-spacing:-.2px}
+  .sectionhead .cnt{font-size:10px;font-weight:800;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 6px;border-radius:999px}
+  .sectionhead .lnk{margin-left:auto;font-size:10.5px;font-weight:800;color:var(--lime)}
+
+  /* ---------- product ---------- */
+  .hero2{position:relative;overflow:hidden;border:1px solid rgba(198,255,74,.22);border-radius:28px;
+    background:linear-gradient(140deg,rgba(198,255,74,.15),var(--surface) 58%);padding:20px}
+  .catpill{font-size:9.5px;font-weight:800;letter-spacing:.5px;color:var(--lime);background:rgba(198,255,74,.12);
+    padding:5px 9px;border-radius:999px;text-transform:uppercase}
+  .bigstock{font-size:46px;font-weight:800;letter-spacing:-1.8px;line-height:48px}
+  .infocard{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--stroke2);border-radius:22px;overflow:hidden;border:1px solid var(--stroke)}
+  .infocard .cell{background:var(--surface);padding:14px 15px}
+  .infocard .k{font-size:10px;font-weight:700;color:var(--muted)}
+  .infocard .v{font-size:15px;font-weight:800;margin-top:3px;letter-spacing:-.2px}
+  .actbtn{flex:1;height:52px;border-radius:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    font-size:10.5px;font-weight:800;border:1px solid var(--stroke);background:var(--surface);color:var(--dim)}
+  .actbtn.lime{background:rgba(198,255,74,.12);border-color:rgba(198,255,74,.25);color:var(--lime)}
+  .oprow{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:16px;background:var(--surface);border:1px solid var(--stroke2)}
+  .opicon{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;flex:none}
+  .opicon.in{color:var(--lime);background:rgba(198,255,74,.12)}
+  .opicon.out{color:var(--coral);background:rgba(255,107,122,.12)}
+  .opicon.inv{color:var(--cyan);background:rgba(99,230,255,.12)}
+  .opname{font-size:12px;font-weight:700;line-height:16px}
+  .opnote{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .opqty{font-size:13px;font-weight:800}
+
+  /* ---------- history ---------- */
+  .queue{display:flex;align-items:center;gap:11px;padding:13px;border-radius:20px;
+    background:rgba(255,194,75,.08);border:1px solid rgba(255,194,75,.24)}
+  .queue .t{font-size:12px;font-weight:800}
+  .queue .s{font-size:10.5px;color:var(--dim);margin-top:1px}
+  .queue .go{font-size:10.5px;font-weight:800;color:var(--amber);background:rgba(255,194,75,.16);padding:8px 12px;border-radius:999px}
+  .daygroup{display:flex;align-items:center;gap:8px;margin-top:4px}
+  .daygroup .d{font-size:13px;font-weight:800}
+  .daygroup .n{font-size:9.5px;font-weight:800;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 6px;border-radius:999px}
+
+  /* ---------- analytics ---------- */
+  .barchart{display:flex;align-items:flex-end;gap:10px;height:118px;margin-top:14px}
+  .bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+  .bpair{flex:1;display:flex;align-items:flex-end;gap:3px;width:100%;justify-content:center}
+  .b{width:8px;border-radius:4px}
+  .b.in{background:linear-gradient(180deg,var(--lime),rgba(198,255,74,.55))}
+  .b.out{background:linear-gradient(180deg,var(--coral),rgba(255,107,122,.4))}
+  .blabel{font-size:9px;font-weight:700;color:var(--muted)}
+  .legend{display:flex;gap:12px;font-size:10px;color:var(--dim);margin-top:10px}
+  .legend i{width:8px;height:8px;border-radius:3px;display:inline-block;margin-right:5px}
+  .donut{width:132px;height:132px;border-radius:50%;position:relative;flex:none;
+    background:conic-gradient(var(--cyan) 0 31%,var(--lime) 31% 55%,var(--violet) 55% 74%,var(--amber) 74% 89%,var(--coral) 89% 100%)}
+  .donut:after{content:"";position:absolute;inset:26px;border-radius:50%;background:var(--surface)}
+  .donut .cl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2}
+  .donut .cl b{font-size:22px;font-weight:800;letter-spacing:-.5px}
+  .donut .cl span{font-size:8.5px;font-weight:800;letter-spacing:1px;color:var(--muted)}
+  .legendrow{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--dim);padding:4px 0}
+  .legendrow b{margin-left:auto;color:var(--text);font-weight:800}
+
+  .screens-title{position:absolute;left:56px;top:12px;font-size:12px;color:#fff}
+  #screen-product .tabbar{display:none}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- ============ 1. SCANNER ============ -->
+  <div class="phone" id="screen-scanner">
+    <div class="camera">
+      <div class="shelf" style="top:120px;background:linear-gradient(180deg,rgba(64,82,100,.28),rgba(20,28,36,.05))"></div>
+      <div class="shelf" style="top:560px;background:linear-gradient(180deg,rgba(52,70,86,.22),rgba(12,18,24,.02))"></div>
+      <div class="box3d"></div>
+      <div class="labelcard">
+        <div class="bc"></div>
+        <div class="bcnum">4601000012343</div>
+        <div class="bcname">ZEBRA DS2208 · A-01-1</div>
+      </div>
+    </div>
+    <div class="vignette"></div>
+
+    <div class="status">
+      <span>9:41</span>
+      <span class="sicons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><path d="M1 8v2.5M5 6v4.5M9 3.5v7M13 1v9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1.5 4.5a9 9 0 0 1 13 0M4 7a5.5 5.5 0 0 1 8 0M6.7 9.4a2 2 0 0 1 2.6 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="23" height="12" viewBox="0 0 23 12" fill="none"><rect x=".7" y=".7" width="18" height="10.6" rx="3" stroke="currentColor" stroke-opacity=".45"/><rect x="2.4" y="2.4" width="13.5" height="7.2" rx="1.7" fill="currentColor"/><path d="M20.5 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" fill-opacity=".5"/></svg>
+      </span>
+    </div>
+
+    <div class="camtop">
+      <div class="logo">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16" /></svg>
+      </div>
+      <div style="margin-left:10px">
+        <div class="brand">СКЛАДСКАН</div>
+        <div class="brand-sub">Основной склад</div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="synchip"><span class="dot"></span>Демо · 3</div>
+      <div class="torch">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5L19.5 10H13l0-8Z"/></svg>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="edge"></div>
+      <span class="c c1"></span><span class="c c2"></span><span class="c c3"></span><span class="c c4"></span>
+      <div class="scanline"></div>
+      <div class="lbl">СКАНИРОВАНИЕ</div>
+    </div>
+
+    <div class="hints">
+      <div class="hintpill"><span class="dot"></span>Наведите на штрихкод</div>
+      <div class="formats">EAN-13 · Code 128 · QR · Data Matrix</div>
+      <div class="ghostbtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M7 9.5h.01M11 9.5h.01M15 9.5h.01M8 14h8"/></svg>
+        Ввести вручную
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19V8.5Z"/><path d="M9 20v-6h6v6"/></svg>Склад<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>История<span class="ind"></span></div>
+      <div class="tab" style="visibility:hidden">Сканер<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 18V9M9.3 18V5M14.7 18v-6M20 18v-9"/></svg>Сводка<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Настройки<span class="ind"></span></div>
+    </div>
+    <div class="scanfab"><div class="in">
+      <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg>
+    </div></div>
+  </div>
+
+  <!-- ============ 2. SCAN RESULT SHEET ============ -->
+  <div class="phone" id="screen-sheet">
+    <div class="sheet-bg"></div>
+    <div class="camera" style="opacity:.55">
+      <div class="box3d" style="top:26%"></div>
+      <div class="labelcard" style="top:26%;opacity:.8">
+        <div class="bc"></div>
+        <div class="bcnum">4601000012343</div>
+        <div class="bcname">ZEBRA DS2208 · A-01-1</div>
+      </div>
+    </div>
+    <div class="sheet-dim"></div>
+    <div class="status">
+      <span>9:41</span>
+      <span class="sicons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><path d="M1 8v2.5M5 6v4.5M9 3.5v7M13 1v9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1.5 4.5a9 9 0 0 1 13 0M4 7a5.5 5.5 0 0 1 8 0M6.7 9.4a2 2 0 0 1 2.6 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="23" height="12" viewBox="0 0 23 12" fill="none"><rect x=".7" y=".7" width="18" height="10.6" rx="3" stroke="currentColor" stroke-opacity=".45"/><rect x="2.4" y="2.4" width="13.5" height="7.2" rx="1.7" fill="currentColor"/><path d="M20.5 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" fill-opacity=".5"/></svg>
+      </span>
+    </div>
+
+    <div class="sheet">
+      <div class="handle"></div>
+      <div class="row">
+        <span class="fmt">EAN-13</span>
+        <div style="flex:1"></div>
+        <span class="badge ok">14 шт.</span>
+        <div style="width:8px"></div>
+        <div class="closeb">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </div>
+      </div>
+      <div class="pname">Сканер штрихкодов<br>Zebra DS2208</div>
+      <div class="row" style="margin-top:5px">
+        <div class="pmeta">ZBR-DS2208 · A-01-1</div>
+        <div style="flex:1"></div>
+        <div class="price">₽ 18 900</div>
+      </div>
+
+      <div class="row" style="margin-top:15px;align-items:flex-end">
+        <div class="grow">
+          <div class="minit">Остаток</div>
+          <div class="row" style="align-items:flex-end;gap:5px">
+            <div class="stocknum">14</div>
+            <div style="font-size:12px;color:var(--dim);padding-bottom:5px">шт.</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="minit">мин. 5 шт.</div>
+          <div style="font-size:10.5px;font-weight:800;color:var(--lime);margin-top:4px">В норме</div>
+        </div>
+      </div>
+      <div class="bar"><i style="width:66%"></i></div>
+
+      <div class="minit" style="margin-top:17px">Действие</div>
+      <div class="actrow">
+        <div class="act on">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          Приход
+        </div>
+        <div class="act">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          Списание
+        </div>
+        <div class="act">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11.2 14 15.5 9M7 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2Z"/></svg>
+          Пересчёт
+        </div>
+      </div>
+
+      <div class="minit" style="margin-top:15px">Количество</div>
+      <div class="stepper">
+        <div class="b"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></div>
+        <div class="v">3 <span class="u">шт.</span></div>
+        <div class="b"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+      </div>
+
+      <div class="cta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        Оприходовать 3 шт.
+      </div>
+      <div class="caption">Операция сохранится на устройстве<br>и уйдёт на сервер автоматически</div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19V8.5Z"/><path d="M9 20v-6h6v6"/></svg>Склад<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>История<span class="ind"></span></div>
+      <div class="tab" style="visibility:hidden">Сканер<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 18V9M9.3 18V5M14.7 18v-6M20 18v-9"/></svg>Сводка<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Настройки<span class="ind"></span></div>
+    </div>
+    <div class="scanfab"><div class="in">
+      <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg>
+    </div></div>
+  </div>
+
+  <!-- ============ 3. STOCK ============ -->
+  <div class="phone" id="screen-stock">
+    <div class="status">
+      <span>9:41</span>
+      <span class="sicons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><path d="M1 8v2.5M5 6v4.5M9 3.5v7M13 1v9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1.5 4.5a9 9 0 0 1 13 0M4 7a5.5 5.5 0 0 1 8 0M6.7 9.4a2 2 0 0 1 2.6 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="23" height="12" viewBox="0 0 23 12" fill="none"><rect x=".7" y=".7" width="18" height="10.6" rx="3" stroke="currentColor" stroke-opacity=".45"/><rect x="2.4" y="2.4" width="13.5" height="7.2" rx="1.7" fill="currentColor"/><path d="M20.5 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" fill-opacity=".5"/></svg>
+      </span>
+    </div>
+
+    <div class="pad" style="padding-top:54px">
+      <div class="row">
+        <div class="grow">
+          <div class="eyebrow">Склад</div>
+          <div class="title">Остатки</div>
+        </div>
+        <div class="synchip"><span class="dot"></span>Демо · 3</div>
+        <div style="width:8px"></div>
+        <div class="roundbtn lime">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg>
+        </div>
+      </div>
+      <div class="sub" style="margin-top:6px;font-size:12px">Основной склад · 20 позиций · синхр. 2 мин назад</div>
+
+      <div class="search" style="margin-top:12px">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4" stroke-linecap="round"/></svg>
+        Название, SKU или штрихкод
+      </div>
+
+      <div class="hero" style="margin-top:12px">
+        <div class="glow"></div>
+        <div class="row">
+          <div class="lbl">СТОИМОСТЬ ЗАПАСОВ</div>
+          <div style="flex:1"></div>
+          <div class="todaychip">сегодня +7</div>
+        </div>
+        <div class="row" style="align-items:flex-end">
+          <div class="bigval grow">₽ 840 020</div>
+          <svg width="86" height="40" viewBox="0 0 86 40" fill="none" style="margin-bottom:3px">
+            <path d="M2 30 14 25 25 28 36 16 47 20 58 9 69 13 82 4" stroke="#C6FF4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 30 14 25 25 28 36 16 47 20 58 9 69 13 82 4V40H2Z" fill="url(#sg)"/>
+            <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#C6FF4A" stop-opacity=".28"/><stop offset="1" stop-color="#C6FF4A" stop-opacity="0"/></linearGradient></defs>
+          </svg>
+        </div>
+        <div class="divider" style="margin-top:14px"></div>
+        <div class="row" style="margin-top:12px">
+          <div class="ministat grow"><b>20</b><span>позиций</span></div>
+          <div class="ministat grow"><b>504</b><span>единиц</span></div>
+          <div class="ministat grow"><b style="color:var(--amber)">4</b><span>мало</span></div>
+        </div>
+      </div>
+
+      <div class="pillrow" style="margin-top:12px">
+        <div class="fpill on">Все <span class="c" style="background:rgba(16,21,5,.15);color:#101505">20</span></div>
+        <div class="fpill">Мало <span class="c">4</span></div>
+        <div class="fpill">Нет <span class="c">1</span></div>
+        <div class="fpill">Не синхр. <span class="c">3</span></div>
+      </div>
+
+      <div class="sectionhead" style="margin-top:15px">
+        <h3>Позиции</h3><span class="cnt">20</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+        <div class="prod">
+          <div class="avatar" style="color:var(--cyan);background:linear-gradient(135deg,rgba(99,230,255,.24),rgba(99,230,255,.06));border:1px solid rgba(99,230,255,.18)">О</div>
+          <div class="grow">
+            <div class="row" style="align-items:flex-start"><div class="nm grow">Сканер штрихкодов Zebra DS2208</div><span class="badge ok">14 шт.</span></div>
+            <div class="meta"><span style="color:var(--muted)">ZBR-DS2208</span> · <span>A-01-1</span><span style="flex:1"></span><span style="color:var(--dim);font-weight:700">₽ 18 900</span></div>
+          </div>
+        </div>
+        <div class="prod">
+          <div class="avatar" style="color:var(--cyan);background:linear-gradient(135deg,rgba(99,230,255,.24),rgba(99,230,255,.06));border:1px solid rgba(99,230,255,.18)">О</div>
+          <div class="grow">
+            <div class="row" style="align-items:flex-start"><div class="nm grow">Принтер этикеток Xprinter XP-460B</div><span class="badge ok">7 шт.</span></div>
+            <div class="meta"><span style="color:var(--muted)">XPR-460B</span> · <span>A-01-2</span><span style="flex:1"></span><span style="color:var(--dim);font-weight:700">₽ 24 900</span></div>
+          </div>
+        </div>
+        <div class="prod">
+          <div class="avatar" style="color:var(--lime);background:linear-gradient(135deg,rgba(198,255,74,.24),rgba(198,255,74,.06));border:1px solid rgba(198,255,74,.18)">Р</div>
+          <div class="grow">
+            <div class="row" style="align-items:flex-start"><div class="nm grow">Этикет-лента 58×40 мм, 1000 шт</div><span class="badge ok">42 рул.</span></div>
+            <div class="meta"><span style="color:var(--muted)">LBL-5840</span> · <span>B-02-1</span><span style="flex:1"></span><span style="color:var(--dim);font-weight:700">₽ 590</span></div>
+          </div>
+        </div>
+        <div class="prod" style="border-color:rgba(255,194,75,.24)">
+          <div class="avatar" style="color:var(--lime);background:linear-gradient(135deg,rgba(198,255,74,.24),rgba(198,255,74,.06));border:1px solid rgba(198,255,74,.18)">Р</div>
+          <div class="grow">
+            <div class="row" style="align-items:flex-start"><div class="nm grow">Картридж Brother TN-2275</div><span class="badge low">3 шт.</span></div>
+            <div class="meta"><span style="color:var(--muted)">BRT-TN2275</span> · <span>C-03-2</span><span style="flex:1"></span><span style="color:var(--dim);font-weight:700">₽ 3 290</span></div>
+          </div>
+        </div>
+        <div class="prod">
+          <div class="avatar" style="color:var(--amber);background:linear-gradient(135deg,rgba(255,194,75,.24),rgba(255,194,75,.06));border:1px solid rgba(255,194,75,.18)">С</div>
+          <div class="grow">
+            <div class="row" style="align-items:flex-start"><div class="nm grow">Перчатки нитриловые, размер M</div><span class="badge ok">68 упак.</span></div>
+            <div class="meta"><span style="color:var(--muted)">GLV-NTR-M</span> · <span>D-01-4</span><span style="flex:1"></span><span style="color:var(--dim);font-weight:700">₽ 690</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19V8.5Z"/><path d="M9 20v-6h6v6"/></svg>Склад<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>История<span class="ind"></span></div>
+      <div class="tab" style="visibility:hidden">Сканер<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 18V9M9.3 18V5M14.7 18v-6M20 18v-9"/></svg>Сводка<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Настройки<span class="ind"></span></div>
+    </div>
+    <div class="scanfab"><div class="in">
+      <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg>
+    </div></div>
+  </div>
+
+  <!-- ============ 4. PRODUCT DETAIL ============ -->
+  <div class="phone" id="screen-product">
+    <div class="status">
+      <span>9:41</span>
+      <span class="sicons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><path d="M1 8v2.5M5 6v4.5M9 3.5v7M13 1v9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1.5 4.5a9 9 0 0 1 13 0M4 7a5.5 5.5 0 0 1 8 0M6.7 9.4a2 2 0 0 1 2.6 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="23" height="12" viewBox="0 0 23 12" fill="none"><rect x=".7" y=".7" width="18" height="10.6" rx="3" stroke="currentColor" stroke-opacity=".45"/><rect x="2.4" y="2.4" width="13.5" height="7.2" rx="1.7" fill="currentColor"/><path d="M20.5 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" fill-opacity=".5"/></svg>
+      </span>
+    </div>
+
+    <div class="pad" style="padding-top:54px">
+      <div class="row">
+        <div class="roundbtn" style="background:var(--surface)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </div>
+        <div style="margin-left:10px" class="grow">
+          <div class="eyebrow">Карточка товара</div>
+          <div style="font-size:11.5px;color:var(--dim);margin-top:1px">Оборудование</div>
+        </div>
+        <div class="synchip"><span class="dot"></span>Демо · 3</div>
+      </div>
+
+      <div class="hero2" style="margin-top:12px">
+        <div class="row">
+          <span class="catpill">Оборудование</span>
+          <div style="flex:1"></div>
+          <span class="badge ok">В норме</span>
+        </div>
+        <div style="font-size:19px;font-weight:700;letter-spacing:-.3px;line-height:24px;margin-top:12px">Сканер штрихкодов<br>Zebra DS2208</div>
+        <div style="font-size:11.5px;color:var(--dim);margin-top:5px">ZBR-DS2208 · ячейка A-01-1</div>
+        <div class="row" style="align-items:flex-end;margin-top:18px">
+          <div class="grow">
+            <div class="minit">На складе</div>
+            <div class="row" style="align-items:flex-end;gap:6px">
+              <div class="bigstock">14</div>
+              <div style="font-size:14px;color:var(--dim);padding-bottom:7px">шт.</div>
+            </div>
+          </div>
+          <div style="text-align:right;padding-bottom:4px">
+            <div class="minit">мин. остаток</div>
+            <div style="font-size:13px;font-weight:800;margin-top:3px">5 шт.</div>
+          </div>
+        </div>
+        <div class="bar" style="margin-top:12px"><i style="width:66%"></i></div>
+        <div class="row" style="justify-content:space-between;margin-top:11px">
+          <span style="font-size:10.5px;color:var(--muted)">Заполнено 66% от нормы</span>
+          <span style="font-size:10.5px;font-weight:800;color:var(--text)">₽ 264 600</span>
+        </div>
+      </div>
+
+      <div class="row" style="gap:9px;margin-top:12px">
+        <div class="actbtn lime">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          Приход
+        </div>
+        <div class="actbtn" style="color:var(--coral);border-color:rgba(255,107,122,.22)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          Списание
+        </div>
+        <div class="actbtn" style="color:var(--cyan);border-color:rgba(99,230,255,.22)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11.2 14 15.5 9M7 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2Z"/></svg>
+          Пересчёт
+        </div>
+      </div>
+
+      <div class="infocard" style="margin-top:12px">
+        <div class="cell"><div class="k">Штрихкод</div><div class="v" style="font-family:ui-monospace,monospace;font-size:13px">4601 0000 1234 3</div></div>
+        <div class="cell"><div class="k">Цена</div><div class="v">₽ 18 900</div></div>
+        <div class="cell"><div class="k">Категория</div><div class="v">Оборудование</div></div>
+        <div class="cell"><div class="k">Обновлено</div><div class="v">сегодня, 09:14</div></div>
+      </div>
+
+      <div class="sectionhead" style="margin-top:16px">
+        <h3>История движений</h3><span class="cnt">3</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-top:9px">
+        <div class="oprow">
+          <div class="opicon in">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </div>
+          <div class="grow"><div class="opname">Поставка № 4790</div><div class="opnote">сегодня, 08:10 · синхронизировано</div></div>
+          <div class="opqty" style="color:var(--lime)">+4</div>
+        </div>
+        <div class="oprow">
+          <div class="opicon out">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </div>
+          <div class="grow"><div class="opname">Выдача в цех № 2</div><div class="opnote">сегодня, 07:48 · синхронизировано</div></div>
+          <div class="opqty" style="color:var(--coral)">−2</div>
+        </div>
+        <div class="oprow">
+          <div class="opicon inv">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11.2 14 15.5 9M7 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2Z"/></svg>
+          </div>
+          <div class="grow"><div class="opname">Плановый пересчёт</div><div class="opnote">вчера, 17:20 · синхронизировано</div></div>
+          <div class="opqty" style="color:var(--cyan)">= 12</div>
+        </div>
+      </div>
+    </div>
+    <div class="tabbar" style="opacity:.35">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19V8.5Z"/><path d="M9 20v-6h6v6"/></svg>Склад<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>История<span class="ind"></span></div>
+      <div class="tab" style="visibility:hidden">Сканер<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 18V9M9.3 18V5M14.7 18v-6M20 18v-9"/></svg>Сводка<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Настройки<span class="ind"></span></div>
+    </div>
+  </div>
+
+  <!-- ============ 5. HISTORY ============ -->
+  <div class="phone" id="screen-history">
+    <div class="status">
+      <span>9:41</span>
+      <span class="sicons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><path d="M1 8v2.5M5 6v4.5M9 3.5v7M13 1v9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1.5 4.5a9 9 0 0 1 13 0M4 7a5.5 5.5 0 0 1 8 0M6.7 9.4a2 2 0 0 1 2.6 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="23" height="12" viewBox="0 0 23 12" fill="none"><rect x=".7" y=".7" width="18" height="10.6" rx="3" stroke="currentColor" stroke-opacity=".45"/><rect x="2.4" y="2.4" width="13.5" height="7.2" rx="1.7" fill="currentColor"/><path d="M20.5 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" fill-opacity=".5"/></svg>
+      </span>
+    </div>
+
+    <div class="pad" style="padding-top:54px">
+      <div class="row">
+        <div class="grow">
+          <div class="eyebrow">Журнал</div>
+          <div class="title">История</div>
+        </div>
+        <div class="synchip"><span class="dot"></span>Демо · 3</div>
+        <div style="width:8px"></div>
+        <div class="roundbtn">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 11a8 8 0 0 0-14-4M4 5v4h4M4 13a8 8 0 0 0 14 4M20 19v-4h-4"/></svg>
+        </div>
+      </div>
+      <div class="sub" style="font-size:12px">Каждое движение товара фиксируется автоматически</div>
+
+      <div class="queue" style="margin-top:12px">
+        <div class="opicon" style="width:42px;height:42px;color:var(--amber);background:rgba(255,194,75,.12)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 18a3.5 3.5 0 0 1-.4-7A5 5 0 0 1 16 9.5a3.5 3.5 0 0 1 .5 7"/><path d="M12 12v6M9.5 15.5 12 18l2.5-2.5"/></svg>
+        </div>
+        <div class="grow">
+          <div class="t">3 операции ждут отправки</div>
+          <div class="s">Демо-режим: отправка имитируется</div>
+        </div>
+        <div class="go">Отправить</div>
+      </div>
+
+      <div class="pillrow" style="margin-top:12px">
+        <div class="fpill on">Все <span class="c" style="background:rgba(16,21,5,.15);color:#101505">30</span></div>
+        <div class="fpill">Приход <span class="c">14</span></div>
+        <div class="fpill">Списание <span class="c">12</span></div>
+        <div class="fpill">Пересчёт <span class="c">4</span></div>
+      </div>
+
+      <div class="daygroup" style="margin-top:13px">
+        <div class="d">Сегодня</div><span class="n">8</span>
+        <div style="flex:1"></div>
+        <span style="font-size:9.5px;font-weight:700;color:var(--muted)">по времени</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:9px;margin-top:9px">
+        <div class="oprow">
+          <div class="opicon in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
+          <div class="grow"><div class="opname">Перчатки нитриловые, размер M</div><div class="opnote">Поставка № 4821 · 08:12</div></div>
+          <div class="opqty" style="color:var(--lime)">+30</div>
+        </div>
+        <div class="oprow">
+          <div class="opicon out"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+          <div class="grow"><div class="opname">Сканер штрихкодов Zebra DS2208</div><div class="opnote">Выдача в цех № 2 · 08:05</div></div>
+          <div class="opqty" style="color:var(--coral)">−2</div>
+        </div>
+        <div class="oprow" style="border-color:rgba(255,194,75,.22)">
+          <div class="opicon out"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+          <div class="grow"><div class="opname">Плёнка воздушно-пузырчатая</div><div class="opnote">Повреждение упаковки · 07:41</div></div>
+          <div class="opqty" style="color:var(--coral)">−3</div>
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--amber)"></div>
+        </div>
+        <div class="oprow">
+          <div class="opicon in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
+          <div class="grow"><div class="opname">Короб картонный 400×300×200</div><div class="opnote">Поставка № 4822 · 07:20</div></div>
+          <div class="opqty" style="color:var(--lime)">+40</div>
+        </div>
+        <div class="oprow">
+          <div class="opicon inv"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11.2 14 15.5 9M7 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2Z"/></svg></div>
+          <div class="grow"><div class="opname">Маркер перманентный чёрный</div><div class="opnote">Плановый пересчёт · 06:58</div></div>
+          <div class="opqty" style="color:var(--cyan)">= 57</div>
+        </div>
+        <div class="oprow">
+          <div class="opicon in"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
+          <div class="grow"><div class="opname">Скотч упаковочный 48 мм × 150 м</div><div class="opnote">Поставка № 4823 · 06:30</div></div>
+          <div class="opqty" style="color:var(--lime)">+6</div>
+        </div>
+        <div class="oprow" style="border-color:rgba(255,194,75,.22)">
+          <div class="opicon inv"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11.2 14 15.5 9M7 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2Z"/></svg></div>
+          <div class="grow"><div class="opname">Клей-карандаш 15 г</div><div class="opnote">Плановый пересчёт · 06:12</div></div>
+          <div class="opqty" style="color:var(--cyan)">= 11</div>
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--amber)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19V8.5Z"/><path d="M9 20v-6h6v6"/></svg>Склад<span class="ind"></span></div>
+      <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>История<span class="ind"></span></div>
+      <div class="tab" style="visibility:hidden">Сканер<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 18V9M9.3 18V5M14.7 18v-6M20 18v-9"/></svg>Сводка<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Настройки<span class="ind"></span></div>
+    </div>
+    <div class="scanfab"><div class="in">
+      <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg>
+    </div></div>
+  </div>
+
+  <!-- ============ 6. ANALYTICS ============ -->
+  <div class="phone" id="screen-analytics">
+    <div class="status">
+      <span>9:41</span>
+      <span class="sicons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><path d="M1 8v2.5M5 6v4.5M9 3.5v7M13 1v9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1.5 4.5a9 9 0 0 1 13 0M4 7a5.5 5.5 0 0 1 8 0M6.7 9.4a2 2 0 0 1 2.6 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="23" height="12" viewBox="0 0 23 12" fill="none"><rect x=".7" y=".7" width="18" height="10.6" rx="3" stroke="currentColor" stroke-opacity=".45"/><rect x="2.4" y="2.4" width="13.5" height="7.2" rx="1.7" fill="currentColor"/><path d="M20.5 4v4a2.2 2.2 0 0 0 0-4Z" fill="currentColor" fill-opacity=".5"/></svg>
+      </span>
+    </div>
+
+    <div class="pad" style="padding-top:54px">
+      <div class="row">
+        <div class="grow">
+          <div class="eyebrow">Аналитика</div>
+          <div class="title">Сводка</div>
+        </div>
+        <div class="synchip"><span class="dot"></span>Демо · 3</div>
+      </div>
+      <div class="sub" style="font-size:12px">Сегодня, 13 ноября · 7 операций</div>
+
+      <div class="hero" style="margin-top:12px">
+        <div class="glow"></div>
+        <div class="row"><div class="lbl">СТОИМОСТЬ ЗАПАСОВ</div></div>
+        <div class="row" style="align-items:flex-end">
+          <div class="bigval grow">₽ 840 020</div>
+          <svg width="78" height="36" viewBox="0 0 78 36" fill="none" style="margin-bottom:3px">
+            <path d="M2 27 11 22 20 25 29 14 38 18 47 8 56 12 66 3 76 7" stroke="#C6FF4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="divider" style="margin-top:13px"></div>
+        <div class="row" style="margin-top:11px">
+          <div class="ministat grow"><b>20</b><span>позиций</span></div>
+          <div class="ministat grow"><b>504</b><span>единиц</span></div>
+          <div class="ministat grow"><b style="color:var(--amber)">5</b><span>внимание</span></div>
+        </div>
+      </div>
+
+      <div class="row" style="gap:10px;margin-top:12px">
+        <div class="card grow" style="border-radius:20px;padding:13px">
+          <div class="row" style="gap:7px">
+            <div class="opicon in" style="width:28px;height:28px;border-radius:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
+            <span style="font-size:10px;font-weight:700;color:var(--muted);line-height:13px">Принято<br>за 7 дней</span>
+          </div>
+          <div style="font-size:22px;font-weight:800;margin-top:6px">187 <span style="font-size:10px;color:var(--muted);font-weight:700">ед.</span></div>
+        </div>
+        <div class="card grow" style="border-radius:20px;padding:13px">
+          <div class="row" style="gap:7px">
+            <div class="opicon out" style="width:28px;height:28px;border-radius:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+            <span style="font-size:10px;font-weight:700;color:var(--muted);line-height:13px">Списано<br>за 7 дней</span>
+          </div>
+          <div style="font-size:22px;font-weight:800;margin-top:6px">64 <span style="font-size:10px;color:var(--muted);font-weight:700">ед.</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;padding:18px;border-radius:24px">
+        <div class="sectionhead"><h3>Движение за неделю</h3></div>
+        <div class="barchart">
+          <div class="bcol"><div class="bpair"><div class="b in" style="height:44px"></div><div class="b out" style="height:18px"></div></div><span class="blabel">Пн</span></div>
+          <div class="bcol"><div class="bpair"><div class="b in" style="height:30px"></div><div class="b out" style="height:26px"></div></div><span class="blabel">Вт</span></div>
+          <div class="bcol"><div class="bpair"><div class="b in" style="height:56px"></div><div class="b out" style="height:14px"></div></div><span class="blabel">Ср</span></div>
+          <div class="bcol"><div class="bpair"><div class="b in" style="height:22px"></div><div class="b out" style="height:34px"></div></div><span class="blabel">Чт</span></div>
+          <div class="bcol"><div class="bpair"><div class="b in" style="height:62px"></div><div class="b out" style="height:20px"></div></div><span class="blabel">Пт</span></div>
+          <div class="bcol"><div class="bpair"><div class="b in" style="height:38px"></div><div class="b out" style="height:12px"></div></div><span class="blabel">Сб</span></div>
+          <div class="bcol"><div class="bpair"><div class="b in" style="height:16px"></div><div class="b out" style="height:8px"></div></div><span class="blabel">Вс</span></div>
+        </div>
+        <div class="legend"><span><i style="background:var(--lime)"></i>приход</span><span><i style="background:var(--coral)"></i>списание</span></div>
+      </div>
+
+      <div class="card" style="margin-top:12px;padding:16px 18px;border-radius:24px">
+        <div class="sectionhead"><h3>Пора заказать</h3><span class="cnt">5</span><span class="lnk">Все</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px;margin-top:6px">
+          <div class="row" style="padding:7px 0">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--coral)"></div>
+            <div style="margin-left:10px" class="grow">
+              <div style="font-size:12px;font-weight:700">Пломба номерная 300 мм</div>
+              <div class="bar" style="margin-top:6px;height:4px"><i style="width:2%;background:var(--coral)"></i></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">осталось 0 · мин. 50 · H-01-5</div>
+            </div>
+            <div style="font-size:18px;font-weight:800;color:var(--coral);margin-left:12px">0</div>
+          </div>
+          <div class="divider"></div>
+          <div class="row" style="padding:7px 0">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--amber)"></div>
+            <div style="margin-left:10px" class="grow">
+              <div style="font-size:12px;font-weight:700">Картридж Brother TN-2275</div>
+              <div class="bar" style="margin-top:6px;height:4px"><i style="width:19%;background:var(--amber)"></i></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">осталось 3 · мин. 6 · C-03-2</div>
+            </div>
+            <div style="font-size:18px;font-weight:800;color:var(--amber);margin-left:12px">3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;padding:16px 18px;border-radius:24px">
+        <div class="sectionhead"><h3>Структура запасов</h3><span class="cnt">5</span></div>
+        <div class="row" style="margin-top:12px">
+          <div class="donut"><div class="cl"><b>20</b><span>SKU</span></div></div>
+          <div style="margin-left:16px" class="grow">
+            <div class="legendrow"><i style="width:8px;height:8px;border-radius:3px;background:var(--cyan)"></i>Оборудование<b>5</b></div>
+            <div class="legendrow"><i style="width:8px;height:8px;border-radius:3px;background:var(--lime)"></i>Расходники<b>5</b></div>
+            <div class="legendrow"><i style="width:8px;height:8px;border-radius:3px;background:var(--violet)"></i>Упаковка<b>5</b></div>
+            <div class="legendrow"><i style="width:8px;height:8px;border-radius:3px;background:var(--amber)"></i>Спецодежда<b>2</b></div>
+            <div class="legendrow"><i style="width:8px;height:8px;border-radius:3px;background:var(--coral)"></i>Канцелярия<b>3</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 8.5 12 4l8 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19V8.5Z"/><path d="M9 20v-6h6v6"/></svg>Склад<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>История<span class="ind"></span></div>
+      <div class="tab" style="visibility:hidden">Сканер<span class="ind"></span></div>
+      <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 18V9M9.3 18V5M14.7 18v-6M20 18v-9"/></svg>Сводка<span class="ind"></span></div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>Настройки<span class="ind"></span></div>
+    </div>
+    <div class="scanfab"><div class="in">
+      <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16"/></svg>
+    </div></div>
+  </div>
+
+</div>
+<script>
+  (function () {
+    const keep = new URLSearchParams(location.search).get('s') || (location.hash ? location.hash.slice(1) : '');
+    if (!keep) return;
+    document.querySelectorAll('.phone').forEach(function (p) { if (p.id !== keep) p.remove(); });
+    const stage = document.querySelector('.stage');
+    stage.style.cssText = 'padding:26px;gap:0;width:max-content;justify-content:flex-start;align-items:flex-start';
+    document.body.style.background = '#070A0F';
+  })();
+</script>
+</body>
+</html>

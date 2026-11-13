@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">СкладСкан</string>
+    <string name="camera_permission_title">Нужен доступ к камере</string>
+    <string name="camera_permission_text">Камера используется только для распознавания штрихкодов. Кадры обрабатываются на устройстве и никуда не отправляются.</string>
+    <string name="camera_permission_button">Разрешить камеру</string>
+</resources>
