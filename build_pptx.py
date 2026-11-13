@@ -617,13 +617,13 @@ box(s, 7.15, 1.62, 5.53, 4.3, fill=RGBColor(0x0E, 0x14, 0x1D), line=RGBColor(0x2
 text(s, 7.45, 1.9, 3.6, 0.22, "GitHub", size=8.5, color=MUTED, bold=True, caps=True)
 text(s, 7.45, 2.15, 3.9, 0.28, "Код, инструкция запуска и APK", size=11, bold=True)
 # МЕСТО ПОД ССЫЛКУ: замените текст и значение ниже
-gh_url = "github.com/username/skladscan"
+gh_url = "github.com/yarikdurden/skladscan"
 text(s, 7.45, 2.75, 4.1, 0.4, gh_url, size=17, bold=True, color=TEXT)
 text(s, 7.45, 3.25, 4.0, 0.6, "Исходный код, инструкция по сборке и готовый APK.",
      size=9, color=MUTED, line_spacing=1.25)
 qr = s.shapes.add_picture(str(ASSETS / "qr-github.png"), Inches(10.72), Inches(4.35), Inches(1.55), Inches(1.55))
 text(s, 10.72, 5.95, 1.55, 0.22, "Проект", size=7.5, color=MUTED, bold=True, align=PP_ALIGN.CENTER, caps=True)
-text(s, 7.45, 5.3, 3.2, 0.4, "Ссылка на репозиторий — здесь", size=8.5, color=MUTED)
+text(s, 7.45, 5.3, 3.2, 0.4, "Есть вопрос — пишите в issues", size=8.5, color=MUTED)
 
 prs.save(OUT)
 print(f"saved: {OUT}  slides={len(prs.slides.__iter__.__self__._sldIdLst)}")
